@@ -1,0 +1,59 @@
+{
+ "dataset": "ESA OPS-SAT (OPSSAT-AD), CC-BY 4.0",
+ "test_segments": 529,
+ "test_anomalies": 113,
+ "results": {
+  "rule": {
+   "precision": 0.792,
+   "recall": 0.54,
+   "f1": 0.642,
+   "mcc": 0.583,
+   "alarms": 77,
+   "caught": 61,
+   "missed": 52,
+   "false_alarms": 16
+  },
+  "unsupervised": {
+   "precision": 0.604,
+   "recall": 0.283,
+   "f1": 0.386,
+   "mcc": 0.318,
+   "alarms": 53,
+   "caught": 32,
+   "missed": 81,
+   "false_alarms": 21
+  },
+  "supervised": {
+   "precision": 0.911,
+   "recall": 0.903,
+   "f1": 0.907,
+   "mcc": 0.881,
+   "alarms": 112,
+   "caught": 102,
+   "missed": 11,
+   "false_alarms": 10
+  }
+ },
+ "top_features": [
+  [
+   "n_peaks",
+   0.253
+  ],
+  [
+   "diff2_peaks",
+   0.103
+  ],
+  [
+   "smooth10_n_peaks",
+   0.08
+  ],
+  [
+   "kurtosis",
+   0.066
+  ],
+  [
+   "len",
+   0.066
+  ]
+ ]
+}

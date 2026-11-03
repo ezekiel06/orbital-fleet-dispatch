@@ -1,0 +1,74 @@
+{
+ "prices_per_kwh": {
+  "H100": [
+   1.57,
+   2.59
+  ],
+  "B200": [
+   3.5,
+   3.74
+  ]
+ },
+ "mixes": {
+  "realistic": {
+   "vs no sharing": {
+    "extra_pct": 5.55,
+    "extra_kwh_per_sat_year": 48139,
+    "usd_per_sat_year": {
+     "H100": [
+      75512,
+      124594
+     ],
+     "B200": [
+      168317,
+      180166
+     ]
+    }
+   },
+   "vs best simple rule": {
+    "extra_pct": 0.0,
+    "extra_kwh_per_sat_year": 0,
+    "usd_per_sat_year": {
+     "H100": [
+      0,
+      0
+     ],
+     "B200": [
+      0,
+      0
+     ]
+    }
+   }
+  },
+  "stormy": {
+   "vs no sharing": {
+    "extra_pct": 5.78,
+    "extra_kwh_per_sat_year": 48396,
+    "usd_per_sat_year": {
+     "H100": [
+      75915,
+      125260
+     ],
+     "B200": [
+      169217,
+      181129
+     ]
+    }
+   },
+   "vs best simple rule": {
+    "extra_pct": 0.0,
+    "extra_kwh_per_sat_year": 0,
+    "usd_per_sat_year": {
+     "H100": [
+      0,
+      0
+     ],
+     "B200": [
+      0,
+      0
+     ]
+    }
+   }
+  }
+ }
+}

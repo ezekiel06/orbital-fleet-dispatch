@@ -1,0 +1,218 @@
+{
+ "episodes": 40,
+ "ai_model": "fleet_ai",
+ "plan": {
+  "LOW": "ai",
+  "ELEVATED": "ai",
+  "HIGH": "ai"
+ },
+ "results": {
+  "LOW": {
+   "policy_used": "ai",
+   "mean": {
+    "local": {
+     "score": 663.5,
+     "work_kwh": 6285.8,
+     "avg_delay_min": 23.0,
+     "restarts": 7.9,
+     "low_batt_min": 0.0
+    },
+    "switch": {
+     "score": 692.0,
+     "work_kwh": 6634.9,
+     "avg_delay_min": 12.7,
+     "restarts": 8.4,
+     "low_batt_min": 0.0
+    },
+    "hybrid": {
+     "score": 703.1,
+     "work_kwh": 6731.3,
+     "avg_delay_min": 14.9,
+     "restarts": 8.4,
+     "low_batt_min": 0.0
+    }
+   },
+   "edge_vs_switch": {
+    "score": {
+     "mean": 11.1,
+     "low": 8.1,
+     "high": 14.0,
+     "wins": 35,
+     "ties": 0,
+     "runs": 40
+    },
+    "work_kwh": {
+     "mean": 96.4,
+     "low": 61.7,
+     "high": 131.1,
+     "wins": 33,
+     "ties": 0,
+     "runs": 40
+    }
+   },
+   "edge_vs_local": {
+    "score": {
+     "mean": 39.7,
+     "low": 36.0,
+     "high": 43.6,
+     "wins": 40,
+     "ties": 0,
+     "runs": 40
+    },
+    "work_kwh": {
+     "mean": 445.6,
+     "low": 411.0,
+     "high": 481.5,
+     "wins": 40,
+     "ties": 0,
+     "runs": 40
+    }
+   }
+  },
+  "ELEVATED": {
+   "policy_used": "ai",
+   "mean": {
+    "local": {
+     "score": 631.8,
+     "work_kwh": 6077.8,
+     "avg_delay_min": 24.2,
+     "restarts": 22.9,
+     "low_batt_min": 0.0
+    },
+    "switch": {
+     "score": 662.8,
+     "work_kwh": 6434.1,
+     "avg_delay_min": 13.3,
+     "restarts": 23.2,
+     "low_batt_min": 0.0
+    },
+    "hybrid": {
+     "score": 679.6,
+     "work_kwh": 6569.2,
+     "avg_delay_min": 16.0,
+     "restarts": 23.0,
+     "low_batt_min": 0.0
+    }
+   },
+   "edge_vs_switch": {
+    "score": {
+     "mean": 16.8,
+     "low": 13.7,
+     "high": 19.7,
+     "wins": 37,
+     "ties": 0,
+     "runs": 40
+    },
+    "work_kwh": {
+     "mean": 135.1,
+     "low": 99.1,
+     "high": 170.6,
+     "wins": 35,
+     "ties": 0,
+     "runs": 40
+    }
+   },
+   "edge_vs_local": {
+    "score": {
+     "mean": 47.8,
+     "low": 42.7,
+     "high": 52.2,
+     "wins": 39,
+     "ties": 0,
+     "runs": 40
+    },
+    "work_kwh": {
+     "mean": 491.4,
+     "low": 451.1,
+     "high": 531.6,
+     "wins": 40,
+     "ties": 0,
+     "runs": 40
+    }
+   }
+  },
+  "HIGH": {
+   "policy_used": "ai",
+   "mean": {
+    "local": {
+     "score": 526.8,
+     "work_kwh": 5397.9,
+     "avg_delay_min": 28.5,
+     "restarts": 75.8,
+     "low_batt_min": 0.0
+    },
+    "switch": {
+     "score": 557.9,
+     "work_kwh": 5742.3,
+     "avg_delay_min": 15.5,
+     "restarts": 76.2,
+     "low_batt_min": 0.0
+    },
+    "hybrid": {
+     "score": 570.7,
+     "work_kwh": 5815.9,
+     "avg_delay_min": 17.5,
+     "restarts": 66.7,
+     "low_batt_min": 0.0
+    }
+   },
+   "edge_vs_switch": {
+    "score": {
+     "mean": 12.8,
+     "low": 5.1,
+     "high": 20.4,
+     "wins": 29,
+     "ties": 0,
+     "runs": 40
+    },
+    "work_kwh": {
+     "mean": 73.6,
+     "low": 16.5,
+     "high": 128.8,
+     "wins": 26,
+     "ties": 1,
+     "runs": 40
+    }
+   },
+   "edge_vs_local": {
+    "score": {
+     "mean": 43.9,
+     "low": 35.0,
+     "high": 53.0,
+     "wins": 39,
+     "ties": 0,
+     "runs": 40
+    },
+    "work_kwh": {
+     "mean": 418.1,
+     "low": 346.2,
+     "high": 490.1,
+     "wins": 39,
+     "ties": 0,
+     "runs": 40
+    }
+   }
+  }
+ },
+ "weather_mix": {
+  "LOW": 0.5,
+  "ELEVATED": 0.25,
+  "HIGH": 0.25
+ },
+ "blended": {
+  "local": {
+   "score": 621.4,
+   "work_kwh": 6011.8
+  },
+  "switch": {
+   "score": 651.2,
+   "work_kwh": 6361.6
+  },
+  "hybrid": {
+   "score": 664.1,
+   "work_kwh": 6461.9
+  }
+ },
+ "gain_vs_rule_pct": 1.58,
+ "gain_vs_local_pct": 7.49
+}

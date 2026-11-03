@@ -1,0 +1,24 @@
+# Secrets: never commit these
+satnogs_token.txt
+*.token
+.env
+
+# Downloaded raw data (fetch with the scripts instead)
+opssat/
+satnogs_*.jsonl
+satnogs_*.next
+starlink.tle
+
+# Caches and run outputs that get regenerated
+__pycache__/
+*.pyc
+sunlight_14d.npy
+fleet_orbits_9d.npz
+run_safe_seed*.zip
+run_seed*.zip
+*.log
+sim_output.csv
+scheduler_results.json
+fleet_results.json
+*_ckpt.zip
+*_ckpt.steps

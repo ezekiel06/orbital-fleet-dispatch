@@ -1,0 +1,8 @@
+skyfield
+sgp4
+numpy
+gymnasium
+stable-baselines3
+scikit-learn
+pandas
+satnogs-decoders

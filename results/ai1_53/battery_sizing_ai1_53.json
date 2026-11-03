@@ -1,0 +1,55 @@
+{
+ "profile": "ai1_53",
+ "rows": [
+  {
+   "kwh": 30,
+   "work_kwh": 12589.375,
+   "lowest_batt": 70.0,
+   "low_min": 0,
+   "share": 0.7827387891505402
+  },
+  {
+   "kwh": 60,
+   "work_kwh": 13248.75,
+   "lowest_batt": 70.1,
+   "low_min": 0,
+   "share": 0.8237351363954302
+  },
+  {
+   "kwh": 90,
+   "work_kwh": 13740.0,
+   "lowest_batt": 70.0,
+   "low_min": 0,
+   "share": 0.8542783865702961
+  },
+  {
+   "kwh": 120,
+   "work_kwh": 14110.625,
+   "lowest_batt": 70.0,
+   "low_min": 0,
+   "share": 0.8773218310406466
+  },
+  {
+   "kwh": 180,
+   "work_kwh": 15210.625,
+   "lowest_batt": 70.0,
+   "low_min": 0,
+   "share": 0.945713841610321
+  },
+  {
+   "kwh": 240,
+   "work_kwh": 15895.0,
+   "lowest_batt": 70.0,
+   "low_min": 0,
+   "share": 0.9882645527317945
+  },
+  {
+   "kwh": 360,
+   "work_kwh": 16083.75,
+   "lowest_batt": 70.1,
+   "low_min": 0,
+   "share": 1.0
+  }
+ ],
+ "pick_kwh": 360
+}

@@ -1,0 +1,79 @@
+{
+ "profile": "ai1_53",
+ "sized_kwh": 240.0,
+ "needed_with_sharing_kwh": 189.1,
+ "saved_kwh_per_sat": 50.9,
+ "curve": {
+  "sizes": [
+   120,
+   150,
+   180,
+   200,
+   240,
+   300,
+   360
+  ],
+  "local": [
+   13583.125,
+   14133.125,
+   14666.875,
+   14975.0,
+   15361.25,
+   15483.125,
+   15566.875
+  ],
+  "fleet": [
+   14110.625,
+   14650.625,
+   15210.625,
+   15542.5,
+   15895.0,
+   15996.25,
+   16083.75
+  ]
+ },
+ "cases": [
+  {
+   "battery": "optimistic (170 Wh/kg)",
+   "launch": "Starship target ($100/kg)",
+   "kg_per_sat": 300,
+   "usd_per_sat": 29955,
+   "usd_per_1000": 29954581
+  },
+  {
+   "battery": "optimistic (170 Wh/kg)",
+   "launch": "early Starship ($1,000/kg)",
+   "kg_per_sat": 300,
+   "usd_per_sat": 299546,
+   "usd_per_1000": 299545807
+  },
+  {
+   "battery": "optimistic (170 Wh/kg)",
+   "launch": "Falcon 9 (~$3,250/kg)",
+   "kg_per_sat": 300,
+   "usd_per_sat": 972326,
+   "usd_per_1000": 972325690
+  },
+  {
+   "battery": "conservative (120 Wh/kg)",
+   "launch": "Starship target ($100/kg)",
+   "kg_per_sat": 424,
+   "usd_per_sat": 42436,
+   "usd_per_1000": 42435656
+  },
+  {
+   "battery": "conservative (120 Wh/kg)",
+   "launch": "early Starship ($1,000/kg)",
+   "kg_per_sat": 424,
+   "usd_per_sat": 424357,
+   "usd_per_1000": 424356560
+  },
+  {
+   "battery": "conservative (120 Wh/kg)",
+   "launch": "Falcon 9 (~$3,250/kg)",
+   "kg_per_sat": 424,
+   "usd_per_sat": 1377461,
+   "usd_per_1000": 1377461394
+  }
+ ]
+}
