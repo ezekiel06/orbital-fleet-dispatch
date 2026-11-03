@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fleet Orbit View</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one mission-control screen. Globe on the left, live telemetry rail on the right; stacks on phones. Single dark look by choice (space). */
+:root{
+  --void:#070B14; --panel:#0E1524; --line:#1F2A40; --text:#E3E8F2; --muted:#93A0B8;
+  --sun:#F5B544; --shadow:#6E8BC9; --saa:#F0605D; --link:#5FD3C4; --throttle:#B58CF0;
+  --display:"Chakra Petch",ui-sans-serif,system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--void);color:var(--text)}
+body{font:15px/1.45 var(--body)}
+.wrap{max-width:1280px;margin:0 auto;padding-block:20px 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.eyebrow{margin:0;font:500 12px var(--mono);letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+h1{margin:0;font:600 30px/1.1 var(--display);letter-spacing:.01em;text-wrap:balance}
+.lede{margin:4px 0 0;color:var(--muted);max-width:62ch}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;background:radial-gradient(circle at 50% 45%,#0D1530 0%,var(--void) 70%);border:1px solid var(--line);border-radius:14px;min-width:0;overflow:hidden}
+canvas{display:block;width:100%;aspect-ratio:1/1;max-width:100%;touch-action:none;cursor:grab}
+canvas:active{cursor:grabbing}
+.hint{position:absolute;left:12px;bottom:10px;margin:0;font:12px var(--mono);color:var(--muted)}
+.clock{position:absolute;right:12px;top:10px;margin:0;font:500 13px var(--mono);color:var(--text);font-variant-numeric:tabular-nums}
+.rail{display:flex;flex-direction:column;gap:12px;min-width:0}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.box h2{margin:0;font:600 13px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button,.btn{min-height:40px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--text);font:500 13px var(--mono);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--text);color:var(--void);border-color:var(--text)}
+button:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat p{margin:0}
+.stat .n{font:600 26px var(--display);font-variant-numeric:tabular-nums}
+.stat .l{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.legend{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:8px}
+.sel p{margin:0}
+.bar{height:8px;border-radius:4px;background:var(--line);position:relative;overflow:hidden}
+.bar i{position:absolute;inset:0 auto 0 0;background:var(--sun)}
+.bar b{position:absolute;top:-2px;bottom:-2px;left:70%;width:2px;background:var(--saa)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}
+.kv dt{color:var(--muted)}.kv dd{margin:0;font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+.note{margin:0;font-size:13px;color:var(--muted);max-width:75ch}
+@media (prefers-reduced-motion:reduce){.hint::after{content:" · motion paused, press Play"}}
+</style>
+
+<div class="wrap">
+<header>
+  <div>
+    <p class="eyebrow">Orbital fleet dispatch · AI1-style · 650 km · 53° tilt</p>
+    <h1>Fleet Orbit View</h1>
+    <p class="lede">Watch the fleet fly through Earth's shadow and the South Atlantic Anomaly. Satellites in shadow run on battery. When a battery reaches its 70% floor, or a satellite enters the radiation zone, its jobs move over a laser link to a satellite in sunlight.</p>
+  </div>
+  <div class="seg" role="group" aria-label="Playback">
+    <button type="button" id="play" class="btn">Pause</button>
+  </div>
+</header>
+
+<div class="grid">
+  <div class="stage">
+    <canvas id="cv" width="900" height="900" role="img" aria-label="Earth with the satellite fleet orbiting, day and night sides, and the shadow behind Earth"></canvas>
+    <p class="clock" id="clock">T+00:00</p>
+    <p class="hint">Drag to turn the view · click a satellite</p>
+  </div>
+
+  <div class="rail">
+    <div class="box">
+      <h2>Fleet size</h2>
+      <div class="seg" role="group" aria-label="Fleet size" id="fleetSeg"></div>
+      <h2>Speed</h2>
+      <div class="seg" role="group" aria-label="Simulation speed" id="speedSeg"></div>
+      <h2>Season</h2>
+      <div class="seg" role="group" aria-label="Season" id="seasonSeg"></div>
+    </div>
+
+    <div class="box">
+      <h2>Right now</h2>
+      <div class="stats">
+        <div class="stat"><p class="n" id="sSun">0</p><p class="l"><i class="dot" style="background:var(--sun)"></i>In sunlight</p></div>
+        <div class="stat"><p class="n" id="sShade">0</p><p class="l"><i class="dot" style="background:var(--shadow)"></i>In shadow</p></div>
+        <div class="stat"><p class="n" id="sSaa">0</p><p class="l"><i class="dot" style="background:var(--saa)"></i>In the SAA</p></div>
+        <div class="stat"><p class="n" id="sLink">0</p><p class="l"><i class="dot" style="background:var(--link)"></i>Jobs handed off</p></div>
+      </div>
+    </div>
+
+    <div class="box sel" id="selBox">
+      <h2 id="selName">Satellite</h2>
+      <div class="bar" aria-hidden="true"><i id="selBar"></i><b></b></div>
+      <dl class="kv">
+        <dt>Battery</dt><dd id="selBatt">–</dd>
+        <dt>Status</dt><dd id="selState">–</dd>
+        <dt>Over</dt><dd id="selPos">–</dd>
+        <dt>Shadow this lap</dt><dd id="selShadow">–</dd>
+      </dl>
+    </div>
+
+    <div class="box">
+      <h2>Key</h2>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--sun)"></i>Sunlit, computing on solar power</span>
+        <span><i class="dot" style="background:var(--shadow)"></i>In shadow, computing on battery</span>
+        <span><i class="dot" style="background:var(--throttle)"></i>Battery at 70% floor, throttled</span>
+        <span><i class="dot" style="border:2px solid var(--saa)"></i>Inside the South Atlantic Anomaly</span>
+        <span><svg width="18" height="6" aria-hidden="true"><line x1="0" y1="3" x2="18" y2="3" stroke="#5FD3C4" stroke-width="2"/></svg>Laser link carrying jobs</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="note">Orbits, Earth's rotation, the shadow and the anomaly zone (lat −50° to 0°, lon −90° to 40°) use the same geometry as the simulator. Altitude is drawn about twice its true height so the satellites stand clear of the globe. Battery is a simple 240 kWh pack: 185 kW of solar, 125 kW of load, with the GPUs throttled to hold the 70% floor. The trained AI's minute-by-minute choices aren't shown here.</p>
+</div>
+
+<script>
+(() => {
+const R_E = 6371, ALT = 650, R_O = (R_E + ALT) / R_E;         // true orbit radius in Earth radii
+const DRAW_R = 1 + (R_O - 1) * 2;                               // drawn radius (altitude x2)
+const MU = 398600.4418, PERIOD = 2 * Math.PI * Math.sqrt(((R_E + ALT) ** 3) / MU) / 60; // minutes
+const INC = 53 * Math.PI / 180, EARTH_W = 2 * Math.PI / 1436;  // rad per minute (sidereal)
+const CAP = 240, SOLAR = 185, LOAD = 125, FLOOR = 0.70;
+const FLEETS = {"12":[3,4],"48":[6,8],"96":[8,12]};
+const SPEEDS = {"60×":1,"300×":5,"1200×":20};
+const SEASONS = {"March":0,"June":23.44};
+let fleetKey = "12", speedKey = "300×", seasonKey = "March", playing = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+let t = 0, sats = [], sel = 0, yaw = 1.2, pitch = 0.3;
+
+const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+const $ = id => document.getElementById(id);
+
+function build(){
+  const [P, K] = FLEETS[fleetKey]; sats = [];
+  for (let p = 0; p < P; p++) for (let k = 0; k < K; k++)
+    sats.push({name:`SAT-${String(p*K+k+1).padStart(2,"0")}`, raan: 2*Math.PI*p/P,
+      u0: 2*Math.PI*(k/K + p/(K*P)), batt: 0.95, shadowMin: 0, lastShadow: 0, state: ""});
+  sel = Math.min(sel, sats.length - 1);
+}
+function seg(id, obj, cur, set){
+  const el = $(id);
+  el.innerHTML = Object.keys(obj).map(k => `<button type="button" data-k="${k}" aria-pressed="${k===cur}">${k}</button>`).join("");
+  el.onclick = e => { const b = e.target.closest("button"); if (!b) return; set(b.dataset.k);
+    [...el.children].forEach(c => c.setAttribute("aria-pressed", c === b)); };
+}
+seg("fleetSeg", FLEETS, fleetKey, k => { fleetKey = k; t = 0; build(); });
+seg("speedSeg", SPEEDS, speedKey, k => speedKey = k);
+seg("seasonSeg", SEASONS, seasonKey, k => seasonKey = k);
+$("play").onclick = () => { playing = !playing; $("play").textContent = playing ? "Pause" : "Play"; };
+$("play").textContent = playing ? "Pause" : "Play";
+
+const sunDir = () => { const d = SEASONS[seasonKey] * Math.PI / 180; return [Math.cos(d), 0, Math.sin(d)]; };
+function satPos(s, tm){
+  const u = s.u0 + 2*Math.PI*tm/PERIOD, cu = Math.cos(u), su = Math.sin(u), cO = Math.cos(s.raan), sO = Math.sin(s.raan), ci = Math.cos(INC), si = Math.sin(INC);
+  return [cu*cO - su*ci*sO, cu*sO + su*ci*cO, su*si];  // unit vector
+}
+const dot = (a,b) => a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+function inShadow(n, s){ const d = dot(n, s) * R_O; if (d >= 0) return false;
+  const px = n[0]*R_O - d*s[0], py = n[1]*R_O - d*s[1], pz = n[2]*R_O - d*s[2]; return px*px+py*py+pz*pz < 1; }
+function latlon(n, tm){ const lat = Math.asin(n[2]); let lon = Math.atan2(n[1], n[0]) - EARTH_W*tm;
+  lon = ((lon + Math.PI) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI) - Math.PI; return [lat*180/Math.PI, lon*180/Math.PI]; }
+const inSAA = ([la, lo]) => la > -50 && la < 0 && lo > -90 && lo < 40;
+
+function step(dt){
+  const s = sunDir();
+  for (const q of sats){
+    q.n = satPos(q, t); q.shade = inShadow(q.n, s); q.ll = latlon(q.n, t); q.saa = inSAA(q.ll);
+    if (q.shade){ q.shadowMin += dt; q.lastShadow = q.shadowMin; } else q.shadowMin = 0;
+    let net = q.shade ? -LOAD : SOLAR - LOAD; q.throttled = false;
+    if (q.shade && q.batt <= FLOOR + 1e-4){ net = 0; q.throttled = true; }
+    q.batt = Math.min(1, Math.max(FLOOR, q.batt + net * dt / 60 / CAP));
+  }
+  // handoffs: throttled or SAA satellites send jobs to the nearest satellite in sunlight and outside the SAA
+  const helpers = sats.filter(q => !q.shade && !q.saa);
+  links = [];
+  for (const q of sats) if ((q.throttled || q.saa) && helpers.length){
+    let best = null, bd = 9;
+    for (const h of helpers){ const d = (q.n[0]-h.n[0])**2+(q.n[1]-h.n[1])**2+(q.n[2]-h.n[2])**2; if (d < bd){ bd = d; best = h; } }
+    if (best && bd < 0.8) links.push([q, best]);
+  }
+}
+let links = [];
+
+// camera
+function basis(){ const ca = Math.cos(yaw), sa = Math.sin(yaw), cb = Math.cos(pitch), sb = Math.sin(pitch);
+  return {f:[cb*ca, cb*sa, sb], r:[-sa, ca, 0], u:[-sb*ca, -sb*sa, cb]}; }
+
+// earth texture buffer
+const ES = 360, eimg = ctx.createImageData(ES, ES), ecv = document.createElement("canvas"); ecv.width = ecv.height = ES;
+const ectx = ecv.getContext("2d");
+function drawEarth(B, s){
+  const d = eimg.data, rot = EARTH_W * t;
+  for (let y = 0; y < ES; y++) for (let x = 0; x < ES; x++){
+    const i = (y*ES + x) * 4, u = (x + .5)/ES*2 - 1, v = 1 - (y + .5)/ES*2, rr = u*u + v*v;
+    if (rr > 1){ d[i+3] = 0; continue; }
+    const w = Math.sqrt(1 - rr);
+    const n = [u*B.r[0]+v*B.u[0]+w*B.f[0], u*B.r[1]+v*B.u[1]+w*B.f[1], u*B.r[2]+v*B.u[2]+w*B.f[2]];
+    const light = n[0]*s[0]+n[1]*s[1]+n[2]*s[2];
+    const lat = Math.asin(n[2])*180/Math.PI; let lon = (Math.atan2(n[1], n[0]) - rot)*180/Math.PI;
+    lon = ((lon + 180) % 360 + 360) % 360 - 180;
+    const day = Math.max(0, Math.min(1, (light + 0.08) / 0.16));       // soft terminator
+    const lam = Math.max(0, light);
+    let r = 10 + day*(22 + 50*lam), g = 16 + day*(50 + 80*lam), b = 34 + day*(80 + 90*lam);
+    const grid = (Math.abs(lat % 30) < 0.7 || Math.abs(lon % 30) < 0.7*1/Math.max(.2, Math.cos(lat*Math.PI/180)));
+    if (grid){ r += 10; g += 14; b += 18; }
+    if (lat > -50 && lat < 0 && lon > -90 && lon < 40){ r = r*0.72 + 240*0.28; g = g*0.85 + 96*0.15; b = b*0.85 + 93*0.15; }
+    const edge = Math.min(1, w * 6);  // limb darkening
+    d[i] = r*edge; d[i+1] = g*edge; d[i+2] = b*edge; d[i+3] = 255;
+  }
+  ectx.putImageData(eimg, 0, 0);
+}
+
+function hull(pts){ pts.sort((a,b)=>a[0]-b[0]||a[1]-b[1]); const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
+  const lo=[],up=[]; for(const p of pts){while(lo.length>1&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p);}
+  for(let i=pts.length-1;i>=0;i--){const p=pts[i];while(up.length>1&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p);}
+  return lo.slice(0,-1).concat(up.slice(0,-1)); }
+
+let scr = [];
+function render(){
+  const W = cv.width, H = cv.height, cx = W/2, cy = H/2, S = W*0.33, B = basis(), s = sunDir();
+  const P = p => [cx + S*dot(p, B.r), cy - S*dot(p, B.u), dot(p, B.f)];
+  ctx.clearRect(0, 0, W, H);
+  // stars
+  ctx.fillStyle = "rgba(220,230,255,.5)";
+  for (let i = 0; i < 140; i++){ const a = (i*97.3)%W, b = (i*53.7*i)%H; ctx.fillRect(a, b, 1.5, 1.5); }
+  // shadow cylinder behind Earth
+  const e1 = Math.abs(s[2]) < .9 ? [0,0,1] : [1,0,0];
+  let a1 = [s[1]*e1[2]-s[2]*e1[1], s[2]*e1[0]-s[0]*e1[2], s[0]*e1[1]-s[1]*e1[0]]; const m = Math.hypot(...a1); a1 = a1.map(x=>x/m);
+  const a2 = [s[1]*a1[2]-s[2]*a1[1], s[2]*a1[0]-s[0]*a1[2], s[0]*a1[1]-s[1]*a1[0]];
+  const pts = [];
+  for (let k = 0; k < 48; k++){ const ph = k/48*2*Math.PI, c = Math.cos(ph), sn = Math.sin(ph);
+    const q = [a1[0]*c+a2[0]*sn, a1[1]*c+a2[1]*sn, a1[2]*c+a2[2]*sn];
+    pts.push(P(q).slice(0,2)); pts.push(P([q[0]-2.6*s[0], q[1]-2.6*s[1], q[2]-2.6*s[2]]).slice(0,2)); }
+  const hl = hull(pts), grad = ctx.createLinearGradient(...P([0,0,0]).slice(0,2), ...P([-2.6*s[0],-2.6*s[1],-2.6*s[2]]).slice(0,2));
+  grad.addColorStop(0, "rgba(40,60,110,.42)"); grad.addColorStop(1, "rgba(40,60,110,0)");
+  ctx.fillStyle = grad; ctx.beginPath(); hl.forEach((p,i)=> i ? ctx.lineTo(...p) : ctx.moveTo(...p)); ctx.closePath(); ctx.fill();
+  // sun direction marker
+  const sp = P(s), sl = Math.hypot(sp[0]-cx, sp[1]-cy);
+  if (sl > 0.25*S){ const k = 1.28*S/sl, lx = cx + (sp[0]-cx)*k, ly = cy + (sp[1]-cy)*k;
+    ctx.fillStyle = "#F5B544"; ctx.font = "500 22px 'IBM Plex Mono', monospace";
+    ctx.textAlign = lx < cx ? "left" : "right"; ctx.fillText(lx < cx ? "← Sun" : "Sun →", lx < cx ? 14 : W - 14, ly); }
+  // orbits (back halves first)
+  const [Pn] = FLEETS[fleetKey];
+  const orbitPath = (raan, front) => { ctx.beginPath(); let on = false;
+    for (let k = 0; k <= 120; k++){ const q = satPos({u0:k/120*2*Math.PI, raan}, 0).map(x=>x*DRAW_R), p = P(q);
+      const hidden = p[2] < 0 && Math.hypot(p[0]-cx, p[1]-cy) < S;
+      if ((p[2] >= 0) === front && !hidden){ on ? ctx.lineTo(p[0],p[1]) : ctx.moveTo(p[0],p[1]); on = true; } else on = false; }
+    ctx.stroke(); };
+  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = "rgba(147,160,184,.18)"; for (let p = 0; p < Pn; p++) orbitPath(2*Math.PI*p/Pn, false);
+  // satellites behind Earth
+  scr = [];
+  const drawSat = q => { const p = P(q.n.map(x=>x*DRAW_R)); const hidden = p[2] < 0 && Math.hypot(p[0]-cx, p[1]-cy) < S;
+    q.p = p; if (hidden) return; scr.push(q);
+    const col = q.throttled ? "#B58CF0" : q.shade ? "#6E8BC9" : "#F5B544", rad = q === sats[sel] ? 11 : 7;
+    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(p[0], p[1], rad, 0, 7); ctx.fill();
+    if (q.saa){ ctx.strokeStyle = "#F0605D"; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(p[0], p[1], rad+5, 0, 7); ctx.stroke(); }
+    if (q === sats[sel]){ ctx.strokeStyle = "#E3E8F2"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(p[0], p[1], rad+10, 0, 7); ctx.stroke(); } };
+  const back = sats.filter(q => P(q.n)[2] < 0), front = sats.filter(q => P(q.n)[2] >= 0);
+  back.forEach(drawSat);
+  // Earth
+  drawEarth(B, s); ctx.imageSmoothingEnabled = true; ctx.drawImage(ecv, cx - S, cy - S, 2*S, 2*S);
+  ctx.strokeStyle = "rgba(120,170,255,.35)"; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cx, cy, S+2, 0, 7); ctx.stroke();
+  ctx.strokeStyle = "rgba(147,160,184,.38)"; ctx.lineWidth = 1.4; for (let p = 0; p < Pn; p++) orbitPath(2*Math.PI*p/Pn, true);
+  // links
+  ctx.strokeStyle = "#5FD3C4"; ctx.lineWidth = 2.2; ctx.setLineDash([8, 6]);
+  for (const [a, b] of links){ const pa = P(a.n.map(x=>x*DRAW_R)), pb = P(b.n.map(x=>x*DRAW_R));
+    const hid = p => p[2] < 0 && Math.hypot(p[0]-cx, p[1]-cy) < S; if (hid(pa) || hid(pb)) continue;
+    ctx.beginPath(); ctx.moveTo(pa[0], pa[1]); ctx.lineTo(pb[0], pb[1]); ctx.stroke(); }
+  ctx.setLineDash([]);
+  front.forEach(drawSat);
+}
+
+function hud(){
+  $("sSun").textContent = sats.filter(q=>!q.shade).length;
+  $("sShade").textContent = sats.filter(q=>q.shade).length;
+  $("sSaa").textContent = sats.filter(q=>q.saa).length;
+  $("sLink").textContent = links.length;
+  const h = Math.floor(t/60), mm = Math.floor(t%60);
+  $("clock").textContent = `T+${String(h).padStart(2,"0")}:${String(mm).padStart(2,"0")}  ·  lap ${PERIOD.toFixed(1)} min`;
+  const q = sats[sel]; if (!q) return;
+  $("selName").textContent = q.name;
+  $("selBar").style.width = (q.batt*100).toFixed(1) + "%";
+  $("selBatt").textContent = (q.batt*100).toFixed(1) + "%";
+  $("selState").textContent = q.throttled ? "Throttled at floor" : q.shade ? "On battery" : "Solar + charging";
+  const [la, lo] = q.ll;
+  $("selPos").textContent = `${Math.abs(la).toFixed(0)}°${la<0?"S":"N"} ${Math.abs(lo).toFixed(0)}°${lo<0?"W":"E"}` + (q.saa ? " · SAA" : "");
+  $("selShadow").textContent = q.lastShadow ? `${q.lastShadow.toFixed(0)} min` : "–";
+}
+
+// interaction
+let drag = null;
+cv.addEventListener("pointerdown", e => { drag = {x:e.clientX, y:e.clientY, yaw, pitch, moved:false}; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener("pointermove", e => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+  yaw = drag.yaw - dx*0.008; pitch = Math.max(-1.3, Math.min(1.3, drag.pitch + dy*0.008)); if (!playing) frame(0); });
+cv.addEventListener("pointerup", e => { if (drag && !drag.moved){ const r = cv.getBoundingClientRect(), k = cv.width / r.width;
+    const x = (e.clientX - r.left)*k, y = (e.clientY - r.top)*k; let best = -1, bd = 900;
+    for (const q of scr){ const d = (q.p[0]-x)**2 + (q.p[1]-y)**2; if (d < bd){ bd = d; best = sats.indexOf(q); } }
+    if (best >= 0){ sel = best; hud(); if (!playing) frame(0); } }
+  drag = null; });
+
+// warm up so batteries start in a realistic state
+build(); for (let i = 0; i < 200; i++){ step(1); t += 1; }
+let last = performance.now();
+function frame(dt){ step(dt); render(); hud(); }
+function loop(now){ const sec = Math.min(0.1, (now - last)/1000); last = now;
+  if (playing){ const dt = sec * SPEEDS[speedKey]; t += dt; frame(dt); }
+  requestAnimationFrame(loop); }
+frame(0); requestAnimationFrame(loop);
+})();
+</script>
+
+</html>

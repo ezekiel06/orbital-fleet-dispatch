@@ -87,6 +87,9 @@ space weather, and fleet wear, and it runs the same 12-satellite fleet model liv
 the gain from sharing, its dollar value, design warnings (radiator too small, battery floor
 broken), and the battery mass sharing saves. Open the file directly; no install needed.
 
+`web/orbit.html` is an animated 3D view of the fleet: satellites circling Earth, passing through
+its shadow and the South Atlantic Anomaly, with battery levels and laser-link job handoffs.
+
 ## Quick start
 
 ```bash
