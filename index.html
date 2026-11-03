@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orbital Fleet Dispatch</title>
+<meta name="description" content="Open-source simulator and AI dispatcher for orbital AI data centers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column of launch tiles under a short mission statement. Single dark look. */
+:root{--void:#070B14;--panel:#0E1524;--line:#1F2A40;--text:#E3E8F2;--muted:#93A0B8;--sun:#F5B544;--link:#5FD3C4;
+--display:"Chakra Petch",ui-sans-serif,system-ui,sans-serif;--body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--void);color:var(--text);font:16px/1.5 var(--body)}
+main{max-width:920px;margin:0 auto;padding-block:48px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
+.eyebrow{margin:0;font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+h1{margin:6px 0 10px;font:600 clamp(32px,6vw,52px)/1.05 var(--display);text-wrap:balance}
+.lede{margin:0;color:var(--muted);max-width:62ch}
+.figs{display:flex;flex-wrap:wrap;gap:12px 28px;margin:0;padding:0;list-style:none}
+.figs li{display:flex;flex-direction:column}
+.figs b{font:600 28px var(--display);color:var(--sun);font-variant-numeric:tabular-nums}
+.figs span{font-size:13px;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+a.tile{display:flex;flex-direction:column;gap:6px;padding:18px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);text-decoration:none;min-height:44px}
+a.tile:hover{border-color:var(--link)}
+a.tile:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+a.tile strong{font:600 18px var(--display)}
+a.tile span{font-size:14px;color:var(--muted)}
+a.tile em{font:500 12px var(--mono);font-style:normal;color:var(--link);letter-spacing:.06em;text-transform:uppercase}
+.more{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px}
+.more a{color:var(--link)}
+.foot{margin:0;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">Open source · MIT · Zeke Horton</p>
+    <h1>Orbital Fleet Dispatch</h1>
+    <p class="lede">A simulator for AI data centers in orbit. It models how much computing a fleet of solar-powered GPU satellites can deliver, and how much better scheduling gets back, without dropping any battery below its safety floor. It runs on real orbits, live space weather and real satellite telemetry.</p>
+  </header>
+
+  <ul class="figs" aria-label="Headline results on AI1-style specs">
+    <li><b>+4.6–5.6%</b><span>more computing from sharing jobs</span></li>
+    <li><b>+2.2%</b><span>AI over best rule, aging 48-sat fleet</span></li>
+    <li><b>96 of 96</b><span>test runs won by the AI there</span></li>
+  </ul>
+
+  <nav class="tiles" aria-label="Pages">
+    <a class="tile" href="results/ai1_53/dashboard.html"><em>Start here</em><strong>Mission dashboard</strong><span>AI1 specs, 53° orbit: live orbit view, fleet results, dollar value, and 12 / 48 / 96 satellite scale tests.</span></a>
+    <a class="tile" href="web/orbit.html"><em>Watch</em><strong>Fleet orbit view</strong><span>Satellites circling Earth through shadow and the South Atlantic Anomaly, with laser-link job handoffs.</span></a>
+    <a class="tile" href="web/index.html"><em>Try</em><strong>Fleet sizer</strong><span>Plug in your own GPU power, solar, battery and radiator and see what sharing is worth.</span></a>
+  </nav>
+
+  <div class="more">
+    <span class="eyebrow">Other dashboards</span>
+    <a href="results/ai1_sso/dashboard.html">AI1, dawn-dusk orbit</a>
+    <a href="results/v3_starlink/dashboard.html">Original design, real Starlink orbits</a>
+    <a href="https://github.com/ezekiel06/orbital-fleet-dispatch">Code and README on GitHub</a>
+  </div>
+
+  <p class="foot">Hardware numbers are public estimates and press reports, not real specs. Every assumption is listed in the README.</p>
+</main>
+</body>
+</html>

@@ -8,6 +8,8 @@ It runs on real public data: live satellite orbits (CelesTrak), live space weath
 real Starlink satellites, bit-flip rates calibrated from Google's TPU radiation tests, and
 real satellite telemetry (ESA OPS-SAT, SatNOGS).
 
+**Live pages:** [dashboard, orbit view and fleet sizer](https://ezekiel06.github.io/orbital-fleet-dispatch/), no install needed.
+
 **Bring your own specs.** Every hardware number is a public estimate. Swap in real power,
 battery, and radiator figures in `sat_profile.py` and rerun.
 
