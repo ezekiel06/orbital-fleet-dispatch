@@ -61,6 +61,11 @@ tbody th{font-weight:400;color:var(--soft);text-align:left}
 <div class="seg" role="group" aria-label="Space weather" id="seg"></div>
 </header>
 <div class="panel take" role="status"><b>Takeaway: </b><span id="take"></span></div>
+<section class="panel" id="orbitbox" style="display:none;flex-direction:column;gap:12px">
+<p class="eyebrow mono">LIVE ORBIT VIEW · DRAG TO TURN · CLICK A SATELLITE</p>
+<h2>The fleet in orbit</h2>
+<iframe id="orbitframe" title="Animated view of the satellite fleet orbiting Earth" style="width:100%;height:1050px;border:0;border-radius:10px;background:#070B14" loading="lazy" srcdoc="__ORBITDOC__"></iframe>
+</section>
 <div class="cards" id="cards"></div>
 <section class="panel" style="display:flex;flex-direction:column;gap:12px">
 <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center">
@@ -230,6 +235,8 @@ function renderScale(){
 }
 $("seg").addEventListener("click", e=>{const b=e.target.closest("button"); if(b){W=b.dataset.w; render(); renderFleet();}});
 render(); renderFleet(); renderValue(); renderScale();
+if (__HAS_ORBIT__) $("orbitbox").style.display = "flex";
+addEventListener("message", e => { if (e.data && e.data.orbitHeight) $("orbitframe").style.height = e.data.orbitHeight + "px"; });
 </script></body></html>
 """
 
@@ -259,6 +266,20 @@ def load_scale():
     return {"sharing": sharing, "ai": ai}
 
 
+def load_orbit():
+    """The animated orbit page, embedded in an iframe so its styles stay separate."""
+    import html, os
+    p = next((p for p in ("orbit_view.html", "web/orbit.html") if os.path.exists(p)), None)
+    if not p:
+        return "", False
+    doc = open(p, encoding="utf-8").read()
+    embed = ("<style>header{display:none}.wrap{padding-block:0 8px}</style>"
+             "<script>addEventListener('load',()=>{const s=()=>parent.postMessage({orbitHeight:"
+             "Math.ceil(document.querySelector('.wrap').getBoundingClientRect().bottom)+8},'*');s();new ResizeObserver(s).observe(document.body);});</script>")
+    doc = doc.replace("</html>", embed + "</html>", 1)
+    return html.escape(doc, quote=True), True
+
+
 def build(results="rl_results.json", out="dashboard.html"):
     with open(results) as f:
         d = json.load(f)
@@ -284,7 +305,9 @@ def build(results="rl_results.json", out="dashboard.html"):
     except FileNotFoundError:
         hyb_js = "null"
     scale = load_scale()
+    orbit_doc, has_orbit = load_orbit()
     html = (TEMPLATE.replace("__SCALE__", json.dumps(scale, separators=(",", ":")).replace("</", "<\\/"))
+            .replace("__ORBITDOC__", orbit_doc).replace("__HAS_ORBIT__", "true" if has_orbit else "false")
             .replace("__DATA__", data).replace("__FLEET__", fleet_js).replace("__HYB__", hyb_js).replace("__VAL__", val_js)
             .replace("__ORBIT__", __import__("sat_profile").LABEL.upper())
             .replace("__N__", str(d.get("episodes_per_level", 20)))
