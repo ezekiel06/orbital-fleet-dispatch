@@ -100,6 +100,13 @@ tbody th{font-weight:400;color:var(--soft);text-align:left}
 <div class="tablebox"><table id="vtbl"></table></div>
 <p class="muted" style="margin:0;font-size:14px">Range = H100 prices (low end) to B200 prices (high end), per kWh of GPU-server power. Assumes every extra kWh is sold at today's rental prices and uses this sim's satellite design (100 kW of GPUs), not a real company's.</p>
 </section>
+<section class="panel" id="heliosbox" style="display:none;flex-direction:column;gap:12px">
+<p class="eyebrow mono">REAL AI JOBS · HELIOS GPU TRACE · AI1 SPECS · 53° ORBIT</p>
+<h2>Sharing on real AI workloads</h2>
+<p class="muted" style="margin:0;font-size:14px" id="helioslead"></p>
+<div class="tablebox"><table id="htbl"></table></div>
+<p class="muted" style="margin:0;font-size:14px">Real deep-learning jobs from SenseTime's Helios GPU clusters (2020): real arrival bursts, GPU counts and run times. Gain = GPU work delivered with sharing vs. each satellite alone, averaged over 6 different 12-hour slices of the trace. Demand = work offered as a share of the fleet's full GPU power.</p>
+</section>
 <section class="panel" id="scalebox" style="display:none;flex-direction:column;gap:12px">
 <p class="eyebrow mono">AI1 SPECS · 53° ORBIT · FLEET SIZE TEST</p>
 <h2>Bigger fleets: 12, 48 and 96 satellites</h2>
@@ -115,6 +122,7 @@ const FLEET = __FLEET__;
 const HYB = __HYB__;
 const VAL = __VAL__;
 const SCALE = __SCALE__;
+const HELIOS = __HELIOS__;
 let MIX = "realistic";
 const MIXNAME = {realistic:"Realistic weather", stormy:"Stormy weather"};
 const MIXDESC = {realistic:"calm 90%, moderate storm 8%, big storm 2% of the time", stormy:"calm 50%, moderate 25%, big storm 25% (the harsh training mix)"};
@@ -162,6 +170,8 @@ function fleetTakeaway(){
   else t+=".";
   if(VAL){const r=VAL.mixes.realistic["vs no sharing"], all=Object.values(r.usd_per_sat_year);
     t+=` Over a realistic year of weather that's worth <b>${money(Math.min(...all.map(v=>v[0]))*1000)}–${money(Math.max(...all.map(v=>v[1]))*1000)}</b> per 1,000 satellites.`;}
+  if(HELIOS && HELIOS["48|1.0|none"]){const h=HELIOS["48|1.0|none"][W];
+    t+=` On real AI jobs from a GPU datacenter trace the gain is larger: <b>${h.gain_pct>=0?"+":""}${h.gain_pct.toFixed(1)}%</b> for 48 satellites at full demand.`;}
   t+=` No battery dropped below its 70% safety floor.`;
   if(SCALE){const sz=Object.keys(SCALE.sharing), big=sz[sz.length-1], ai=Object.entries(SCALE.ai).filter(([,v])=>v);
     t+=` Bigger fleets gain more: +${SCALE.sharing[big][0].toFixed(1)}% from sharing at ${big} satellites`;
@@ -241,6 +251,18 @@ function renderFleet(){
     rows.map(([l,k,dp,dir])=>{const vals=P.map(p=>a[p][k]); const best=dir>0?Math.max(...vals):dir<0?Math.min(...vals):null;
       return `<tr><th scope="row">${l}</th>${P.map(p=>`<td class="mono" style="${best!==null&&a[p][k]===best?"color:#F5C66B;font-weight:700":""}">${a[p][k].toFixed(dp)}</td>`).join("")}</tr>`}).join("")+"</tbody>";
 }
+function renderHelios(){
+  if(!HELIOS) return;
+  $("heliosbox").style.display="flex";
+  const keys=Object.keys(HELIOS).filter(k=>!k.startsWith("_"));
+  const pct=v=>`${v>=0?"+":""}${v.toFixed(1)}%`;
+  const label=k=>{const [n,ld,lk]=k.split("|"); return `${n} satellites · demand ${Math.round(ld*100)}%`+(lk==="today"?" · Starlink-today links":"");};
+  let wins=0, runs=0; keys.forEach(k=>["LOW","ELEVATED","HIGH"].forEach(w=>{wins+=HELIOS[k][w].wins; runs+=HELIOS[k][w].runs;}));
+  const all=keys.flatMap(k=>["LOW","ELEVATED","HIGH"].map(w=>HELIOS[k][w].gain_pct));
+  $("helioslead").textContent=`On real AI jobs, sharing delivers ${pct(Math.min(...all))} to ${pct(Math.max(...all))} more GPU work, depending on how busy the fleet is. It won ${wins} of ${runs} paired runs, and no battery dropped below its 70% floor.`;
+  $("htbl").innerHTML=`<thead><tr><th scope="col">Case</th>${["Calm sun","Moderate storm","Big storm"].map(n=>`<th scope="col">${n}</th>`).join("")}</tr></thead><tbody>`+
+    keys.map(k=>`<tr><th scope="row">${label(k)}</th>${["LOW","ELEVATED","HIGH"].map(w=>{const v=HELIOS[k][w]; return `<td class="mono"${w===W?' style="color:#F5C66B;font-weight:700"':""}>${pct(v.gain_pct)} <span class="muted">(${v.wins}/${v.runs})</span></td>`}).join("")}</tr>`).join("")+"</tbody>";
+}
 function renderScale(){
   if(!SCALE) return;
   $("scalebox").style.display="flex";
@@ -253,8 +275,8 @@ function renderScale(){
   const last=sizes[sizes.length-1];
   $("scalelead").textContent=`Sharing gets better as the fleet grows: ${pct(SCALE.sharing[sizes[0]][0])} at ${sizes[0]} satellites, ${pct(SCALE.sharing[last][0])} at ${last} (calm sun). More satellites means more places to send each job.`;
 }
-$("seg").addEventListener("click", e=>{const b=e.target.closest("button"); if(b){W=b.dataset.w; render(); renderFleet();}});
-render(); renderFleet(); renderValue(); renderScale();
+$("seg").addEventListener("click", e=>{const b=e.target.closest("button"); if(b){W=b.dataset.w; render(); renderFleet(); renderHelios();}});
+render(); renderFleet(); renderValue(); renderScale(); renderHelios();
 if (__HAS_ORBIT__) $("orbitbox").style.display = "flex";
 addEventListener("message", e => { if (e.data && e.data.orbitHeight) $("orbitframe").style.height = e.data.orbitHeight + "px"; });
 </script></body></html>
@@ -300,6 +322,12 @@ def load_orbit():
     return html.escape(doc, quote=True), True
 
 
+def load_helios():
+    import os
+    p = next((p for p in ("helios_results.json", "results/helios/helios_results.json") if os.path.exists(p)), None)
+    return json.load(open(p)) if p else None
+
+
 def build(results="rl_results.json", out="dashboard.html"):
     with open(results) as f:
         d = json.load(f)
@@ -326,7 +354,8 @@ def build(results="rl_results.json", out="dashboard.html"):
         hyb_js = "null"
     scale = load_scale()
     orbit_doc, has_orbit = load_orbit()
-    html = (TEMPLATE.replace("__SCALE__", json.dumps(scale, separators=(",", ":")).replace("</", "<\\/"))
+    html = (TEMPLATE.replace("__HELIOS__", json.dumps(load_helios(), separators=(",", ":")))
+            .replace("__SCALE__", json.dumps(scale, separators=(",", ":")).replace("</", "<\\/"))
             .replace("__ORBITDOC__", orbit_doc).replace("__HAS_ORBIT__", "true" if has_orbit else "false")
             .replace("__DATA__", data).replace("__FLEET__", fleet_js).replace("__HYB__", hyb_js).replace("__VAL__", val_js)
             .replace("__ORBIT__", __import__("sat_profile").LABEL.upper())
