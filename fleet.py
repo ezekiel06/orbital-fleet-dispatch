@@ -63,6 +63,19 @@ LINK = LINKS[_os.environ.get("SAT_LINK", "none")]
 # upload from the ground before it can start (0 = ignore the ground link).
 JOB_GB = float(_os.environ.get("SAT_JOB_GB", "10"))
 JOB_IN_GB = float(_os.environ.get("SAT_JOB_IN_GB", "0"))
+# SAT_MOVE=smart (default): with link limits on, only move a running job when the
+# transfer is quicker than waiting for its own satellite and short next to the
+# work it has left. SAT_MOVE=always: move whenever another satellite has room.
+SMART_MOVES = _os.environ.get("SAT_MOVE", "smart") == "smart"
+
+
+def _worth_moving(j, sat, i, transfer):
+    """Is moving this job cheaper than letting it wait?"""
+    if not LINK or not SMART_MOVES:
+        return True
+    left = j["mins"] - j["done_min"]
+    wait = sat.sh_left[i] if not sat.lit[i] else 10  # shadow: wait it out; sunlit but saving battery: ~10 min
+    return transfer < wait and transfer <= 0.25 * left
 
 
 def _state_gb(j):
@@ -285,8 +298,9 @@ def simulate(mode, lit, saa, names, weather, minutes, seed):
                 best_spare = None
                 for c in cands:
                     src = j.get("prev")
-                    if src is not None and c != src and not can_send(src, _state_gb(j)):
-                        continue  # sender's lasers are full this minute
+                    if src is not None and c != src and (not can_send(src, _state_gb(j)) or
+                            not _worth_moving(j, sats[src], i, _transfer_min(_state_gb(j)))):
+                        continue  # sender's lasers are full, or moving costs more than waiting
                     spare = budgets[c] - sum(x["kw"] for x in sats[c].running)
                     # best fit: the satellite whose spare power is closest to the job's size
                     if spare >= j["kw"] and (best_spare is None or spare < best_spare):
@@ -319,6 +333,8 @@ def simulate(mode, lit, saa, names, weather, minutes, seed):
                             target, tspare = c, spare
                     if target is not None and not can_send(si, _state_gb(j)):
                         blocked += 1; target = None
+                    if target is not None and LINK and SMART_MOVES and _transfer_min(_state_gb(j)) > 1:
+                        target = None  # a radiation dodge is only worth a quick move
                     if target is not None:
                         s.running.remove(j); sats[target].running.append(j)
                         j["sat"] = target; j["stall"] = send(si, _state_gb(j)); moves += 1

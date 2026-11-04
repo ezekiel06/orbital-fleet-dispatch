@@ -70,22 +70,24 @@ stormy = 50 / 25 / 25.
 ### 4. Laser-link limits: the gain survives real bandwidth
 
 Moving a running job means sending its working state over a laser link. `link_test.py` caps each
-satellite's lasers at real speeds and makes jobs carry more data (AI1 specs, 53°, sharing vs. no
-sharing, calm / moderate / big storm):
+satellite's lasers at real speeds and makes jobs carry more data. Each case runs two dispatchers:
+**always** moves a job whenever another satellite has room; **smart** moves it only when the transfer
+is quicker than waiting and short next to the work left. Sharing vs. no sharing, AI1 specs, 53°,
+calm / moderate / big storm:
 
-| Link setup | Data per job moved | 12 satellites | 48 satellites |
-| --- | --- | --- | --- |
-| Starlink today (3 × 100 Gbps) | 10–100 GB | +3.8 / +3.5 / +3.4% | +3.7 / +3.8 / +3.0% |
-| Starlink today | 1 TB | +3.6 / +2.7 / +3.3% | +3.8 / +3.5 / +3.2% |
-| Starlink today | 5 TB | +0.2 / −0.6 / +1.3% | +0.9 / +0.7 / +0.5% |
-| Starlink V3 (6 × 400 Gbps) | 5 TB | +3.2 / +2.7 / +3.1% | +3.7 / +3.5 / +3.7% |
-| Slow (1 × 10 Gbps) | 1 TB | −3.2 / −4.5 / −3.4% | −2.4 / −2.6 / −1.7% |
-| Shared queue, running jobs never move | — | +4.4 / +4.0 / +4.7% | +4.3 / +3.9 / +4.1% |
+| Link setup | Data per job moved | 12 sats, always | 12 sats, smart | 48 sats, always | 48 sats, smart |
+| --- | --- | --- | --- | --- | --- |
+| Starlink today (3 × 100 Gbps) | 100 GB | +3.8 / +3.5 / +3.4% | +3.6 / +3.5 / +4.7% | +3.7 / +3.8 / +3.0% | +3.8 / +3.8 / +4.0% |
+| Starlink today | 5 TB | +0.2 / −0.6 / +1.3% | +4.4 / +4.0 / +4.7% | +0.9 / +0.7 / +0.5% | +4.3 / +3.9 / +4.1% |
+| Starlink V3 (6 × 400 Gbps) | 5 TB | +3.2 / +2.7 / +3.1% | +3.5 / +3.2 / +2.8% | +3.7 / +3.5 / +3.7% | +3.9 / +3.3 / +3.4% |
+| Slow (1 × 10 Gbps) | 1 TB | −3.2 / −4.5 / −3.4% | +4.4 / +4.0 / +4.7% | −2.4 / −2.6 / −1.7% | +4.3 / +3.9 / +4.1% |
+| Slow | 5 TB | −16.3 / −17.1 / −14.2% | +4.4 / +4.0 / +4.7% | −13.5 / −14.6 / −12.0% | +4.3 / +3.9 / +4.1% |
 
 Most of the gain comes from *where new jobs start*, which needs only a tiny dispatch message, not
-from moving running jobs. Moving very large jobs over slow links costs more than it saves, so a
-real dispatcher should place work and avoid moving heavy jobs. Sources: Starlink sustains 100 Gbps
-per laser link ([SPIE Photonics West via TechSpot](https://www.techspot.com/community/topics/starlink-satellites-exchange-petabytes-of-data-per-day-through-space-laser-links.284184));
+from moving running jobs. Moving heavy jobs blindly over slow links costs more than it saves; the
+smart rule avoids that and keeps sharing at +3–5% in every case tested. It is on by default when
+link limits are on (`SAT_MOVE=always` turns it off). Sources: Starlink sustains 100 Gbps per laser
+link ([SPIE Photonics West via TechSpot](https://www.techspot.com/community/topics/starlink-satellites-exchange-petabytes-of-data-per-day-through-space-laser-links.284184));
 Starlink V3 reports six 400 Gbps lasers and 1 Tbps downlink ([Converge Digest](https://convergedigest.com/starlink-v3-boosts-per-satellite-downlink-capacity-to-1-tbps/));
 commercial laser links run 1–100 Gbps and Google's Suncatcher design needs ~10 Tbps with satellites
 100–200 m apart ([paper](https://arxiv.org/abs/2511.19468)). Lasers per satellite today (3) is our assumption.

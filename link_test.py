@@ -5,6 +5,9 @@ progress) over a laser link. This test limits each satellite's lasers to real
 speeds and makes jobs carry more and more data, then checks how much of the
 sharing gain survives.
 
+Each limited case runs twice: moving jobs whenever there's room (always) and
+only when the move is worth it (smart, see fleet.py).
+
 Link speeds (see fleet.py, SAT_LINK):
   today  3 lasers x 100 Gbps (Starlink's reported sustained rate per link)
   v3     6 lasers x 400 Gbps (reported Starlink V3)
@@ -39,8 +42,8 @@ print(json.dumps(out))
 ''' % (WEATHER, SEEDS, SEEDS)
 
 
-def run(size, link, gb):
-    env = dict(os.environ, SAT_PROFILE="ai1_53", SAT_FLEET=SIZES[size], SAT_LINK=link, SAT_JOB_GB=str(gb),
+def run(size, link, gb, move="smart"):
+    env = dict(os.environ, SAT_PROFILE="ai1_53", SAT_FLEET=SIZES[size], SAT_LINK=link, SAT_JOB_GB=str(gb), SAT_MOVE=move,
                OMP_NUM_THREADS="1")
     p = subprocess.run([sys.executable, "-c", WORKER], capture_output=True, text=True, env=env)
     if p.returncode:
@@ -50,12 +53,12 @@ def run(size, link, gb):
 
 def main():
     from concurrent.futures import ThreadPoolExecutor
-    jobs = [(n, l, gb) for n in SIZES for l, gb in CASES]
+    jobs = [(n, l, gb, mv) for n in SIZES for l, gb in CASES for mv in (("always", "smart") if l not in ("none", "nomove") else ("always",))]
     results = {}
     with ThreadPoolExecutor(max_workers=2) as ex:
-        for (n, l, gb), r in zip(jobs, ex.map(lambda a: run(*a), jobs)):
-            results[f"{n}|{l}|{gb}"] = r
-            print(f"{n:>3} satellites  link {l:5}  {gb:>5} GB/job  " +
+        for (n, l, gb, mv), r in zip(jobs, ex.map(lambda a: run(*a), jobs)):
+            results[f"{n}|{l}|{gb}|{mv}"] = r
+            print(f"{n:>3} satellites  link {l:6} {gb:>5} GB/job  {mv:6}  " +
                   " | ".join(f"{w}: {v['gain_pct']:+.1f}% (moves {v['moves']:.0f}, blocked {v['blocked']:.0f})" for w, v in r.items()),
                   flush=True)
     json.dump(results, open("link_results.json", "w"), indent=1)
