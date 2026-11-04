@@ -22,3 +22,7 @@ scheduler_results.json
 fleet_results.json
 *_ckpt.zip
 *_ckpt.steps
+
+# Helios trace (fetch with python workload.py)
+helios_src/
+helios_jobs.npz

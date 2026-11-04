@@ -230,11 +230,16 @@ def make_jobs(minutes, rate_per_min, rng):
 def simulate(mode, lit, saa, names, weather, minutes, seed):
     rng = np.random.default_rng(seed)
     import sat_profile
-    jobs = make_jobs(minutes, 1.3 * sat_profile.job_rate_scale(SAT), rng)
+    if _os.environ.get("SAT_JOBS") == "helios":  # real AI jobs from the Helios GPU trace
+        import workload
+        jobs = workload.helios_jobs(minutes, len(names), SAT["gpu_max_kw"], rng)
+    else:
+        jobs = make_jobs(minutes, 1.3 * sat_profile.job_rate_scale(SAT), rng)
     err_rng = np.random.default_rng(seed + 99)
     import sat_profile
     sats = [Sat(n, lit[s], saa[s], sat_profile.sat_params(SAT, s)) for s, n in enumerate(names)]
     restarts, moves, energy_wasted = 0, 0, 0.0
+    delivered = 0.0  # GPU work actually done, finished or not (long real jobs outlast the run)
     by_arrival = sorted(jobs, key=lambda j: j["arrive"])
     nxt = 0
     rr = 0  # round-robin pointer for LOCAL
@@ -354,6 +359,7 @@ def simulate(mode, lit, saa, names, weather, minutes, seed):
                     j["done_min"] = 0.0; restarts += 1
                     continue
                 j["done_min"] += speed
+                delivered += j["kw"] * speed / 60
                 if j["done_min"] >= j["mins"]:
                     j["state"] = "done"; j["finish"] = i
                     s.running.remove(j)
@@ -371,6 +377,7 @@ def simulate(mode, lit, saa, names, weather, minutes, seed):
         "jobs_arrived": len(jobs),
         "jobs_done": len(done),
         "work_kwh": round(sum(j["kw"] * j["mins"] for j in done) / 60, 1),
+        "delivered_kwh": round(delivered - energy_wasted, 1),
         "restarts": restarts,
         "wasted_kwh": round(energy_wasted, 1),
         "moves": moves,

@@ -92,7 +92,32 @@ Starlink V3 reports six 400 Gbps lasers and 1 Tbps downlink ([Converge Digest](h
 commercial laser links run 1–100 Gbps and Google's Suncatcher design needs ~10 Tbps with satellites
 100–200 m apart ([paper](https://arxiv.org/abs/2511.19468)). Lasers per satellite today (3) is our assumption.
 
-### 5. Money saved at launch: less battery to fly
+### 5. Real AI workloads: sharing gains more, not less
+
+The tests above use three made-up job types. `helios_test.py` replays **real deep-learning jobs**
+from SenseTime's [Helios GPU datacenter trace](https://github.com/S-Lab-System-Group/HeliosData)
+(4 clusters, 2020, ~1.6 million GPU jobs): real arrival bursts, real GPU counts, real run times from
+seconds to days (`workload.py`; 1 GPU = 1.275 kW). AI1 specs, 53°, 6 different 12-hour slices of
+the trace per case, measuring GPU work actually delivered. Sharing vs. no sharing, calm / moderate /
+big storm:
+
+| Fleet | Demand vs. fleet GPU power | Sharing gain |
+| --- | --- | --- |
+| 12 satellites | 80% | +11.6 / +11.3 / +11.5% |
+| 12 satellites | 100% | +6.3 / +7.9 / +7.8% |
+| 12 satellites | 120% | +5.8 / +3.5 / +3.5% |
+| 48 satellites | 80% | +9.7 / +11.0 / +7.8% |
+| 48 satellites | 100% | +8.9 / +7.5 / +5.6% |
+| 48 satellites | 120% | +4.1 / +4.6 / +2.3% |
+| 48 satellites, Starlink-today links, 80 GB per GPU moved | 100% | +7.1 / +5.4 / +2.5% |
+
+Sharing won 131 of 144 paired runs, and no battery went below its 70% floor. Real jobs arrive in
+bursts, so a shared fleet has more idle capacity to soak them up than the steady made-up jobs
+suggested. The losses (13 runs) were mostly on the small 12-satellite fleet, where one huge job can
+block a satellite. Jobs larger than one satellite (over ~94 GPUs, about 0.1% of jobs) were left out;
+running them would take several satellites working as one machine, which isn't modeled.
+
+### 6. Money saved at launch: less battery to fly
 
 A sharing fleet matches a non-sharing fleet's output with **~51 kWh less battery per satellite**
 (240 → ~189 kWh). That's **300–424 kg** per satellite (at 170 / 120 Wh/kg space battery packs):
@@ -102,14 +127,14 @@ A sharing fleet matches a non-sharing fleet's output with **~51 kWh less battery
 | $100/kg (Starship target) | $30M – $42M |
 | $1,000/kg (illustrative early Starship) | $300M – $424M |
 
-### 6. Design checks on SpaceX's reported AI1 numbers
+### 7. Design checks on SpaceX's reported AI1 numbers
 
 - A 110 m² radiator works only if it sheds heat from **both faces**: it settles near 58 °C at
   120 kW, versus ~121 °C on one face (`radiator_check.py`).
 - Keeping ~99% of full output through Earth's shadow on a 53° orbit takes **~240 kWh** of
   battery with a 70% floor (`battery_sizing.py`).
 
-### 7. Problem detection on real ESA telemetry
+### 8. Problem detection on real ESA telemetry
 
 On ESA's OPS-SAT anomaly benchmark, a supervised model catches 102 of 113 real problems
 (F1 0.91) vs. 61 for fixed alarm limits, close to the paper's published Random Forest result.
@@ -168,6 +193,7 @@ run `python satnogs_fetch.py`, then `python canvas_analysis.py`.
 | 9 | `value.py`, `savings.py` | Money made (extra computing) and saved (battery mass) |
 | — | `scale_test.py` | Sharing gain at 12 / 48 / 96 satellites |
 | — | `link_test.py` | Sharing gain with real laser-link speed limits |
+| — | `workload.py`, `helios_test.py` | Real AI jobs from the Helios GPU trace |
 | 10 | `radiator_check.py`, `battery_sizing.py` | Design checks |
 | 11 | `telemetry_check.py`, `satnogs_fetch.py`, `canvas_analysis.py` | Real telemetry |
 | — | `sat_profile.py` | Satellite and orbit setups; put your own specs here |
@@ -228,6 +254,7 @@ and results at 12, 48, and 96 satellites.
 - Battery packs: [Airbus LEO battery](https://www.satnow.com/products/batteries/airbus/98-1213-stellar-lowpower-lp-),
   [GS Yuasa module](https://www.satnow.com/products/batteries/gs-yuasa-lithium-power/98-1270-ma190-206)
 - Launch prices: [New Space Economy, June 2026](https://newspaceeconomy.ca/2026/06/21/how-accurate-were-elon-musks-falcon-9-and-starship-kg-claims/)
+- Real AI jobs: [Helios trace](https://github.com/S-Lab-System-Group/HeliosData), SenseTime / S-Lab, SC '21 paper; raw data not redistributed here
 - RL: [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3); orbits: [Skyfield](https://rhodesmill.org/skyfield/)
 
 ## License
