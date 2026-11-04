@@ -44,7 +44,7 @@ tbody th{font-weight:400;color:var(--soft);text-align:left}
 <div class="wrap">
 <header>
 <div style="display:flex;flex-direction:column;gap:6px">
-<p class="eyebrow mono">ORBITAL COMPUTE SIM · AI1 SPECS · 53° TILT · 650 KM · UPDATED NOV 03 2026 05:51 PM</p>
+<p class="eyebrow mono">ORBITAL COMPUTE SIM · AI1 SPECS · 53° TILT · 650 KM · UPDATED NOV 03 2026 07:59 PM</p>
 <h1>SAT-01 Mission Board</h1>
 <p class="muted" style="margin:0">Same satellite, different schedulers. Averages of 20 unseen 6-hour runs per weather type.</p>
 </div>
@@ -420,7 +420,7 @@ const DATA = {"averages":{"LOW":{"baseline":{"work_kwh":681.8,"jobs_done":44.2,"
 const FLEET = {"averages":{"LOW":{"local":{"work_kwh":7164.0,"jobs_done":453.2,"restarts":8.5,"wasted_kwh":140.8,"moves":0.0,"low_batt_min":0.0,"avg_delay_min":22.4,"score":747.2},"fleet":{"work_kwh":7464.9,"jobs_done":487.2,"restarts":8.8,"wasted_kwh":120.9,"moves":230.4,"low_batt_min":0.0,"avg_delay_min":11.2,"score":776.7},"strict":{"work_kwh":6824.3,"jobs_done":473.2,"restarts":5.0,"wasted_kwh":71.2,"moves":106.9,"low_batt_min":0.0,"avg_delay_min":12.7,"score":712.3},"ai":{"work_kwh":7386.8,"jobs_done":451.5,"restarts":8.6,"wasted_kwh":103.0,"moves":535.5,"low_batt_min":0.0,"avg_delay_min":21.4,"score":773.4}},"ELEVATED":{"local":{"work_kwh":6931.8,"jobs_done":446.1,"restarts":25.1,"wasted_kwh":377.6,"moves":0.0,"low_batt_min":0.0,"avg_delay_min":24.6,"score":712.7},"fleet":{"work_kwh":7220.3,"jobs_done":480.1,"restarts":25.6,"wasted_kwh":354.2,"moves":226.2,"low_batt_min":0.0,"avg_delay_min":12.7,"score":741.0},"strict":{"work_kwh":6665.6,"jobs_done":468.6,"restarts":15.2,"wasted_kwh":219.6,"moves":108.3,"low_batt_min":0.0,"avg_delay_min":13.5,"score":689.3},"ai":{"work_kwh":7238.4,"jobs_done":451.9,"restarts":26.9,"wasted_kwh":342.9,"moves":480.4,"low_batt_min":0.0,"avg_delay_min":20.7,"score":747.4}},"HIGH":{"local":{"work_kwh":6142.8,"jobs_done":416.2,"restarts":83.6,"wasted_kwh":1191.6,"moves":0.0,"low_batt_min":0.0,"avg_delay_min":31.6,"score":591.5},"fleet":{"work_kwh":6475.5,"jobs_done":460.6,"restarts":85.7,"wasted_kwh":1072.7,"moves":210.8,"low_batt_min":0.0,"avg_delay_min":16.1,"score":629.7},"strict":{"work_kwh":6145.3,"jobs_done":455.2,"restarts":49.9,"wasted_kwh":728.3,"moves":108.4,"low_batt_min":0.0,"avg_delay_min":15.4,"score":610.1},"ai":{"work_kwh":6369.8,"jobs_done":402.6,"restarts":85.4,"wasted_kwh":1028.8,"moves":482.6,"low_batt_min":0.0,"avg_delay_min":30.8,"score":623.9}}},"policies":["local","fleet","strict","ai"],"episodes":40,"satellites":["AI1-P1-S1","AI1-P1-S2","AI1-P1-S3","AI1-P1-S4","AI1-P2-S1","AI1-P2-S2","AI1-P2-S3","AI1-P2-S4","AI1-P3-S1","AI1-P3-S2","AI1-P3-S3","AI1-P3-S4"],"orbit":"AI1 specs \u00b7 53\u00b0 tilt \u00b7 650 km"};
 const HYB = {"episodes":40,"ai_model":"fleet_ai","plan":{"LOW":"fleet","ELEVATED":"ai","HIGH":"fleet"},"results":{"LOW":{"policy_used":"fleet","mean":{"local":{"score":741.8,"work_kwh":7089.5,"avg_delay_min":21.5,"restarts":8.7,"low_batt_min":0.0},"switch":{"score":772.9,"work_kwh":7406.4,"avg_delay_min":10.6,"restarts":8.9,"low_batt_min":0.0},"hybrid":{"score":772.9,"work_kwh":7406.4,"avg_delay_min":10.6,"restarts":8.9,"low_batt_min":0.0}},"edge_vs_switch":{"score":{"mean":0.0,"low":0.0,"high":0.0,"wins":0,"ties":40,"runs":40},"work_kwh":{"mean":0.0,"low":0.0,"high":0.0,"wins":0,"ties":40,"runs":40}},"edge_vs_local":{"score":{"mean":31.1,"low":26.4,"high":35.7,"wins":38,"ties":0,"runs":40},"work_kwh":{"mean":316.9,"low":270.3,"high":359.6,"wins":39,"ties":0,"runs":40}}},"ELEVATED":{"policy_used":"ai","mean":{"local":{"score":703.9,"work_kwh":6866.2,"avg_delay_min":24.0,"restarts":25.6,"low_batt_min":0.0},"switch":{"score":739.5,"work_kwh":7194.9,"avg_delay_min":11.8,"restarts":26.2,"low_batt_min":0.0},"hybrid":{"score":748.8,"work_kwh":7233.9,"avg_delay_min":18.6,"restarts":25.6,"low_batt_min":0.0}},"edge_vs_switch":{"score":{"mean":9.2,"low":4.8,"high":13.8,"wins":28,"ties":0,"runs":40},"work_kwh":{"mean":39.0,"low":3.1,"high":75.6,"wins":24,"ties":1,"runs":40}},"edge_vs_local":{"score":{"mean":44.9,"low":39.0,"high":50.7,"wins":40,"ties":0,"runs":40},"work_kwh":{"mean":367.7,"low":320.0,"high":416.3,"wins":40,"ties":0,"runs":40}}},"HIGH":{"policy_used":"fleet","mean":{"local":{"score":590.7,"work_kwh":6117.6,"avg_delay_min":30.5,"restarts":83.6,"low_batt_min":0.0},"switch":{"score":634.3,"work_kwh":6498.2,"avg_delay_min":15.2,"restarts":83.4,"low_batt_min":0.0},"hybrid":{"score":634.3,"work_kwh":6498.2,"avg_delay_min":15.2,"restarts":83.4,"low_batt_min":0.0}},"edge_vs_switch":{"score":{"mean":0.0,"low":0.0,"high":0.0,"wins":0,"ties":40,"runs":40},"work_kwh":{"mean":0.0,"low":0.0,"high":0.0,"wins":0,"ties":40,"runs":40}},"edge_vs_local":{"score":{"mean":43.5,"low":35.8,"high":51.1,"wins":38,"ties":0,"runs":40},"work_kwh":{"mean":380.6,"low":319.9,"high":440.9,"wins":39,"ties":0,"runs":40}}}},"weather_mix":{"LOW":0.5,"ELEVATED":0.25,"HIGH":0.25},"blended":{"local":{"score":694.5,"work_kwh":6790.7},"switch":{"score":729.9,"work_kwh":7126.5},"hybrid":{"score":732.2,"work_kwh":7136.2}},"gain_vs_rule_pct":0.14,"gain_vs_local_pct":5.09};
 const VAL = {"prices_per_kwh":{"H100":[1.57,2.59],"B200":[3.5,3.74]},"mixes":{"realistic":{"vs no sharing":{"extra_pct":4.57,"extra_kwh_per_sat_year":39206,"usd_per_sat_year":{"H100":[61499,101473],"B200":[137083,146733]}},"vs best simple rule":{"extra_pct":0.04,"extra_kwh_per_sat_year":380,"usd_per_sat_year":{"H100":[595,982],"B200":[1327,1421]}}},"stormy":{"vs no sharing":{"extra_pct":5.09,"extra_kwh_per_sat_year":42039,"usd_per_sat_year":{"H100":[65943,108806],"B200":[146989,157337]}},"vs best simple rule":{"extra_pct":0.14,"extra_kwh_per_sat_year":1186,"usd_per_sat_year":{"H100":[1861,3070],"B200":[4148,4440]}}}}};
-const SCALE = {"sharing":{"12":[3.3,3.0,1.8],"48":[4.3,4.2,4.3],"96":[4.8,4.9,4.4]},"ai":{"12":{"pct":1.55,"wins":98,"runs":120,"lo":21107,"hi":50361},"48":{"pct":2.19,"wins":96,"runs":96,"lo":30114,"hi":71850},"96":null}};
+const SCALE = {"sharing":{"12":[3.3,3.0,1.8],"48":[4.3,4.2,4.3],"96":[4.8,4.9,4.4]},"ai":{"12":{"pct":1.55,"wins":98,"runs":120,"lo":21107,"hi":50361},"48":{"pct":2.19,"wins":96,"runs":96,"lo":30114,"hi":71850},"96":{"pct":2.25,"wins":96,"runs":96,"lo":31023,"hi":74020}}};
 let MIX = "realistic";
 const MIXNAME = {realistic:"Realistic weather", stormy:"Stormy weather"};
 const MIXDESC = {realistic:"calm 90%, moderate storm 8%, big storm 2% of the time", stormy:"calm 50%, moderate 25%, big storm 25% (the harsh training mix)"};
@@ -455,6 +455,26 @@ let W = "HIGH";
 const $ = id => document.getElementById(id);
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 
+function fleetTakeaway(){
+  // Leads with the fleet results; falls back to the single-satellite summary when there is no fleet data.
+  if(!FLEET) return "";
+  const a=FLEET.averages[W], share=(a.fleet.work_kwh/a.local.work_kwh-1)*100;
+  const lead={LOW:"In calm sun",ELEVATED:"During a moderate storm",HIGH:"During a big storm"}[W];
+  let t=`${lead}, sharing jobs across the fleet does <b>${share>=0?"+":""}${share.toFixed(1)}% more computing</b> than satellites working alone`;
+  if(HYB){const h=HYB.results[W], e=h.edge_vs_switch.score;
+    t+= h.policy_used==="ai"
+      ? `, and the AI dispatcher adds more on top, beating the best simple rule in ${e.wins} of ${e.runs} fresh runs.`
+      : `. Here a simple rule already captures it, so the dispatcher uses the rule.`;}
+  else t+=".";
+  if(VAL){const r=VAL.mixes.realistic["vs no sharing"], all=Object.values(r.usd_per_sat_year);
+    t+=` Over a realistic year of weather that's worth <b>${money(Math.min(...all.map(v=>v[0]))*1000)}–${money(Math.max(...all.map(v=>v[1]))*1000)}</b> per 1,000 satellites.`;}
+  t+=` No battery dropped below its 70% safety floor.`;
+  if(SCALE){const sz=Object.keys(SCALE.sharing), big=sz[sz.length-1], ai=Object.entries(SCALE.ai).filter(([,v])=>v);
+    t+=` Bigger fleets gain more: +${SCALE.sharing[big][0].toFixed(1)}% from sharing at ${big} satellites`;
+    if(ai.length){const [n,v]=ai[ai.length-1]; t+=`, and on an aging ${n}-satellite fleet the AI adds +${v.pct.toFixed(1)}% over the best rule`;}
+    t+=".";}
+  return t;
+}
 function takeaway(a){
   const byWork = [...C].sort((x,y)=>a[y].work_kwh-a[x].work_kwh);
   const byScore = [...C].sort((x,y)=>a[y].score-a[x].score);
@@ -469,7 +489,7 @@ function takeaway(a){
 function render(){
   const a = DATA.averages[W];
   $("seg").innerHTML = Object.keys(NAMES).map(k=>`<button type="button" data-w="${k}" aria-pressed="${k===W}">${NAMES[k]}</button>`).join("");
-  $("take").textContent = takeaway(a);
+  $("take").innerHTML = fleetTakeaway() || esc(takeaway(a));
   const bestWork = [...C].sort((x,y)=>a[y].work_kwh-a[x].work_kwh)[0];
   $("cards").innerHTML = C.map(c=>`
     <div class="panel card ${c===bestWork?"best":""}">

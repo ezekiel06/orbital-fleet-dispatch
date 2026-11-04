@@ -16,7 +16,7 @@ Saves:  hybrid_results.json
 import argparse, json
 import numpy as np
 from stable_baselines3 import PPO
-import fleet
+import fleet, sat_profile
 from fleet_rl import FleetEnv, play, EP_MIN, RISKS
 from confirm_fleet import ci
 
@@ -81,7 +81,7 @@ def main():
     summary = {p: {k: round(blend(p, k), 1) for k in ("score", "work_kwh")} for p in ("local", "switch", "hybrid")}
     gain_rule = (summary["hybrid"]["work_kwh"] / summary["switch"]["work_kwh"] - 1) * 100
     gain_local = (summary["hybrid"]["work_kwh"] / summary["local"]["work_kwh"] - 1) * 100
-    print(f"\nWeather mix (50% calm / 25% moderate / 25% big storm), work per 6 h for 12 satellites:")
+    print(f"\nWeather mix (50% calm / 25% moderate / 25% big storm), work per 6 h for {sat_profile.N_SATS} satellites:")
     print(f"  local {summary['local']['work_kwh']:.0f} kWh | best rule {summary['switch']['work_kwh']:.0f} | hybrid "
           f"{summary['hybrid']['work_kwh']:.0f}  ->  +{gain_rule:.1f}% vs best rule, +{gain_local:.1f}% vs no sharing")
     with open("hybrid_results.json", "w") as f:

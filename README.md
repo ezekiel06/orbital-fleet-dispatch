@@ -54,10 +54,18 @@ Same AI1 53° setup at 12, 48, and 96 satellites (demand scaled to fleet size,
 | 48 satellites | +4.3% / +4.2% / +4.3% |
 | 96 satellites | +4.8% / +4.9% / +4.4% |
 
-The AI dispatcher's edge also grows. On an aging fleet (one in three satellites worn), it beats
-the best simple rule by **+1.6% at 12 satellites** but **+2.2% at 48**, winning **32 of 32**
-fresh test runs in every weather ($30M–$72M per 1,000 satellites per year). The 96-satellite AI test is running; results
-will be added here.
+The AI dispatcher's edge holds or grows with fleet size. On an aging fleet (one in three satellites
+worn), against the best simple rule:
+
+| Fleet | AI vs. best rule (realistic weather) | AI vs. best rule (stormy weather) | Fresh test runs won | Value per 1,000 satellites / year |
+| --- | --- | --- | --- | --- |
+| 12 satellites | +1.6% | +1.6% | 98 of 120 | $21M – $50M |
+| 48 satellites | +2.2% | +2.6% | 96 of 96 | $30M – $72M |
+| 96 satellites | +2.3% | +3.4% | 96 of 96 | $31M – $74M |
+
+At 96 satellites the AI also won all 72 runs of the separate confirmation test, and no battery
+went below its 70% floor. Realistic weather = calm 90% / moderate storm 8% / big storm 2%;
+stormy = 50 / 25 / 25.
 
 ### 4. Money saved at launch: less battery to fly
 
@@ -152,7 +160,7 @@ Being upfront about these is the point:
 - **Simple heat model:** the whole satellite has one temperature; no hot spots.
 - **Every extra kWh is assumed sold** at today's rental prices. GPU prices move fast.
 - **Launch prices:** Starship has no published price; the $/kg values are scenarios.
-- **Fleet size:** tested at 12, 48, and 96 satellites (the AI at 12 and 48). Thousands are untested.
+- **Fleet size:** tested at 12, 48, and 96 satellites, AI included. Thousands are untested.
 - **Training is random:** 3 tries per AI, the best picked on separate validation orbits.
   Some tries lose to the rules, which is why that selection step matters.
 

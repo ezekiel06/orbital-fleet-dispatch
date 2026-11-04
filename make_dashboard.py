@@ -149,6 +149,26 @@ let W = "HIGH";
 const $ = id => document.getElementById(id);
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 
+function fleetTakeaway(){
+  // Leads with the fleet results; falls back to the single-satellite summary when there is no fleet data.
+  if(!FLEET) return "";
+  const a=FLEET.averages[W], share=(a.fleet.work_kwh/a.local.work_kwh-1)*100;
+  const lead={LOW:"In calm sun",ELEVATED:"During a moderate storm",HIGH:"During a big storm"}[W];
+  let t=`${lead}, sharing jobs across the fleet does <b>${share>=0?"+":""}${share.toFixed(1)}% more computing</b> than satellites working alone`;
+  if(HYB){const h=HYB.results[W], e=h.edge_vs_switch.score;
+    t+= h.policy_used==="ai"
+      ? `, and the AI dispatcher adds more on top, beating the best simple rule in ${e.wins} of ${e.runs} fresh runs.`
+      : `. Here a simple rule already captures it, so the dispatcher uses the rule.`;}
+  else t+=".";
+  if(VAL){const r=VAL.mixes.realistic["vs no sharing"], all=Object.values(r.usd_per_sat_year);
+    t+=` Over a realistic year of weather that's worth <b>${money(Math.min(...all.map(v=>v[0]))*1000)}–${money(Math.max(...all.map(v=>v[1]))*1000)}</b> per 1,000 satellites.`;}
+  t+=` No battery dropped below its 70% safety floor.`;
+  if(SCALE){const sz=Object.keys(SCALE.sharing), big=sz[sz.length-1], ai=Object.entries(SCALE.ai).filter(([,v])=>v);
+    t+=` Bigger fleets gain more: +${SCALE.sharing[big][0].toFixed(1)}% from sharing at ${big} satellites`;
+    if(ai.length){const [n,v]=ai[ai.length-1]; t+=`, and on an aging ${n}-satellite fleet the AI adds +${v.pct.toFixed(1)}% over the best rule`;}
+    t+=".";}
+  return t;
+}
 function takeaway(a){
   const byWork = [...C].sort((x,y)=>a[y].work_kwh-a[x].work_kwh);
   const byScore = [...C].sort((x,y)=>a[y].score-a[x].score);
@@ -163,7 +183,7 @@ function takeaway(a){
 function render(){
   const a = DATA.averages[W];
   $("seg").innerHTML = Object.keys(NAMES).map(k=>`<button type="button" data-w="${k}" aria-pressed="${k===W}">${NAMES[k]}</button>`).join("");
-  $("take").textContent = takeaway(a);
+  $("take").innerHTML = fleetTakeaway() || esc(takeaway(a));
   const bestWork = [...C].sort((x,y)=>a[y].work_kwh-a[x].work_kwh)[0];
   $("cards").innerHTML = C.map(c=>`
     <div class="panel card ${c===bestWork?"best":""}">

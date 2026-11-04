@@ -279,7 +279,7 @@ def train(seed, steps):
     else:
         model = PPO("MlpPolicy", env, n_steps=720, batch_size=360, gamma=0.995,
                     learning_rate=3e-4, ent_coef=0.01, verbose=0, seed=seed)
-    chunk = 50_000
+    chunk = 10_000
     for done in range(start, steps, chunk):
         model.learn(chunk, reset_num_timesteps=False)
         model.save(ckpt)
