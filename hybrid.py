@@ -13,7 +13,7 @@ best simple rule (fleet normally, strict in a big storm).
 Usage:  python hybrid.py [--episodes 40]
 Saves:  hybrid_results.json
 """
-import argparse, json
+import argparse, json, os
 import numpy as np
 from stable_baselines3 import PPO
 import fleet, sat_profile
@@ -43,6 +43,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--episodes", type=int, default=40)
     a = ap.parse_args()
+    os.environ.setdefault("SAT_JOBS_PART", "test")  # real-job runs: test on weeks training never saw
     lit, saa, names = fleet.build_fleet_real(2 * 1440 + EP_MIN + 61)
     starts = np.random.default_rng(777).integers(0, 2 * 1440, size=a.episodes)  # fresh, not Step 11's
     model = PPO.load(AI_MODEL)

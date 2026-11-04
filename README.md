@@ -33,7 +33,8 @@ South Atlantic Anomaly (a radiation hot spot). Tested on SpaceX AI1-style specs
 ### 2. A trained AI dispatcher: +1–1.6% more when power is tight
 
 With comfortable hardware, plain sharing captures nearly everything and the AI adds ~0%.
-When power gets tight, a reinforcement-learning dispatcher (PPO) beats the best simple rule:
+When power gets tight, a reinforcement-learning dispatcher (PPO) beats the best simple rule on the
+made-up jobs (on real AI jobs it ties a weather-aware rule; see section 5):
 
 | Stress test | AI vs. best simple rule | Runs won (of 40, per weather) | Value per 1,000 satellites / year |
 | --- | --- | --- | --- |
@@ -116,6 +117,15 @@ bursts, so a shared fleet has more idle capacity to soak them up than the steady
 suggested. The losses (13 runs) were mostly on the small 12-satellite fleet, where one huge job can
 block a satellite. Jobs larger than one satellite (over ~94 GPUs, about 0.1% of jobs) were left out;
 running them would take several satellites working as one machine, which isn't modeled.
+
+**The trained AI on real jobs: a tie with a simple rule.** Retrained on real Helios jobs (48
+satellites, aging fleet; trained on the first 70% of the trace's dates, tested on the last 20%), the
+AI learned the right strategy for each kind of weather and beat plain sharing by a wide margin in
+storms. But a simple weather-aware rule (share normally in calm weather; always move sensitive jobs
+out of the South Atlantic Anomaly in storms) does just as well: the AI's edge over it was too close
+to call in all three weather levels (`results/helios_ai_48/`). The AI's +2–3% edge in sections 2–3
+holds for the made-up jobs only. On real jobs, the recommendation is the weather-aware rule, which
+gives +7.9% over no sharing in stormy weather.
 
 ### 6. Money saved at launch: less battery to fly
 

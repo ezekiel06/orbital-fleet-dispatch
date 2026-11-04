@@ -175,7 +175,7 @@ function fleetTakeaway(){
   t+=` No battery dropped below its 70% safety floor.`;
   if(SCALE){const sz=Object.keys(SCALE.sharing), big=sz[sz.length-1], ai=Object.entries(SCALE.ai).filter(([,v])=>v);
     t+=` Bigger fleets gain more: +${SCALE.sharing[big][0].toFixed(1)}% from sharing at ${big} satellites`;
-    if(ai.length){const [n,v]=ai[ai.length-1]; t+=`, and on an aging ${n}-satellite fleet the AI adds +${v.pct.toFixed(1)}% over the best rule`;}
+    if(ai.length){const [n,v]=ai[ai.length-1]; t+=`, and on an aging ${n}-satellite fleet the AI adds +${v.pct.toFixed(1)}% over the best rule on simulated jobs (on real AI jobs it ties a simple weather-aware rule)`;}
     t+=".";}
   return t;
 }

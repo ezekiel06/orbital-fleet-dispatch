@@ -52,10 +52,14 @@ def get_orbits():
     return lit, saa, names
 
 
+def _mw(j):
+    return round(j["kw"] * 1000)
+
+
 class FleetEnv(gym.Env):
     def __init__(self, lit, saa, names, split="train", mode="ai"):
         super().__init__()
-        self.lit, self.saa, self.names, self.mode = lit, saa, names, mode
+        self.lit, self.saa, self.names, self.mode, self.split = lit, saa, names, mode, split
         lo, hi = SPLITS[split]
         self.range = (lo * 1440, hi * 1440 - EP_MIN - 1)
         # SAA "entering soon" lookahead, per satellite per minute
@@ -75,7 +79,11 @@ class FleetEnv(gym.Env):
         self.weather = o.get("weather") or RISKS[self.np_random.choice(3, p=[0.5, 0.25, 0.25])]
         rng = np.random.default_rng(int(self.np_random.integers(1 << 30)))
         import sat_profile
-        self.jobs = fleet.make_jobs(EP_MIN, 1.3 * sat_profile.job_rate_scale(fleet.SAT), rng)
+        if os.environ.get("SAT_JOBS") == "helios":  # real AI jobs, from this split's own weeks of the trace
+            import workload
+            self.jobs = workload.helios_jobs(EP_MIN, len(self.names), fleet.SAT["gpu_max_kw"], rng, part=os.environ.get("SAT_JOBS_PART", self.split))
+        else:
+            self.jobs = fleet.make_jobs(EP_MIN, 1.3 * sat_profile.job_rate_scale(fleet.SAT), rng)
         self.err_rng = np.random.default_rng(int(self.np_random.integers(1 << 30)))
         self.sats = []
         for s, nm in enumerate(self.names):
@@ -99,9 +107,14 @@ class FleetEnv(gym.Env):
                 j["sat"] = self.rr % len(self.sats); self.rr += 1
             self.queue.append(j)
         self.budgets = [s.safe_budget(i) for s in self.sats]
+        self._recount()
 
     def _spare(self, c):
-        return self.budgets[c] - sum(x["kw"] for x in self.sats[c].running)
+        return self.budgets[c] - self.used[c] / 1000
+
+    def _recount(self):
+        """Power each satellite's running jobs use (kept as a running tally for speed)."""
+        self.used = [sum(_mw(x) for x in s.running) for s in self.sats]  # whole milliwatts: exact, order-free
 
     def _obs(self):
         i, g = self.t, self.i0 + self.t
@@ -152,6 +165,7 @@ class FleetEnv(gym.Env):
                         j["prev"] = si; j["sat"] = None; j["hold"] = MOVE_DELAY_MIN
                         self.queue.append(j)
 
+        self._recount()
         # handoffs out of the SAA where a clean satellite has room (uses the reserve)
         if not local:
             for si, s in enumerate(sats):
@@ -167,17 +181,21 @@ class FleetEnv(gym.Env):
                             tgt, tsp = c, sp
                     if tgt is not None:
                         s.running.remove(j); sats[tgt].running.append(j)
+                        self.used[si] -= _mw(j); self.used[tgt] += _mw(j)
                         j["sat"] = tgt; j["stall"] = MOVE_DELAY_MIN; st["moves"] += 1
 
         # assign queued jobs (oldest first, best fit)
         self.queue.sort(key=lambda j: j["arrive"])
         clean_spare = sum(max(0, self._spare(c)) for c in range(len(sats)) if not sats[c].saa[i])
         still = []
+        max_spare = max(self._spare(c) for c in range(len(sats)))
         for j in self.queue:
             if j["state"] != "queued":
                 continue
             if j.get("hold", 0) > 0:
                 j["hold"] -= 1; still.append(j); continue
+            if j["kw"] > max_spare:  # fits nowhere this minute (same outcome, skips the search)
+                still.append(j); continue
             if local:
                 tiers = [[j["sat"]]]
             else:
@@ -207,7 +225,9 @@ class FleetEnv(gym.Env):
             if j.get("prev") is not None and j["prev"] != best:
                 st["moves"] += 1
             j["prev"] = None; j["sat"] = best; j["state"] = "running"
-            sats[best].running.append(j)
+            sats[best].running.append(j); self.used[best] += _mw(j)
+            if self._spare(best) + j["kw"] >= max_spare - 1e-9:
+                max_spare = max(self._spare(c) for c in range(len(sats)))
             if not sats[best].saa[i]:
                 clean_spare -= j["kw"]
         self.queue = still

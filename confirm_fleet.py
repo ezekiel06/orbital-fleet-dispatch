@@ -17,7 +17,7 @@ Rules compared:
 Usage:  python confirm_fleet.py [--episodes 40]
 Saves:  fleet_confirm.json
 """
-import argparse, json
+import argparse, json, os
 import numpy as np
 from stable_baselines3 import PPO
 import fleet
@@ -35,6 +35,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--episodes", type=int, default=40)
     a = ap.parse_args()
+    os.environ.setdefault("SAT_JOBS_PART", "test")  # real-job runs: test on weeks training never saw
     lit, saa, names = fleet.build_fleet_real(2 * 1440 + EP_MIN + 61)
     starts = np.random.default_rng(2026).integers(0, 2 * 1440, size=a.episodes)
     models = {"ai": PPO.load("fleet_ai")}  # the run picked on validation (day 6)

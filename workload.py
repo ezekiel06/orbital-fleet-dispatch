@@ -57,16 +57,23 @@ def _load():
     return _cache
 
 
-def helios_jobs(minutes, n_sats, gpu_max_kw, rng, load=None):
+PARTS = {"train": (0.0, 0.7), "val": (0.7, 0.8), "test": (0.8, 1.0), None: (0.0, 1.0)}
+
+
+def helios_jobs(minutes, n_sats, gpu_max_kw, rng, load=None, part=None):
+    """part: train / val / test use separate date ranges of the trace (first 70% /
+    next 10% / last 20% of each cluster's six months), so the AI is tested on
+    jobs from weeks it never trained on. None = any date."""
     load = float(os.environ.get("SAT_LOAD", "1.0")) if load is None else load
     d = _load()
     cl = CLUSTERS[rng.integers(len(CLUSTERS))]
     sub, gpu, dur = d[f"{cl}_submit"], d[f"{cl}_gpu"], d[f"{cl}_dur"]
     win = minutes * 60
+    lo, hi = (int(f * sub.max()) for f in PARTS[part])
     target = load * n_sats * gpu_max_kw * minutes  # kW-minutes offered over the run
     picked, offered, too_big = [], 0.0, 0
     while offered < target:
-        t0 = rng.integers(0, int(sub.max()) - win)
+        t0 = rng.integers(lo, hi - win)
         idx = np.nonzero((sub >= t0) & (sub < t0 + win))[0]
         for k in idx:
             kw = gpu[k] * KW_PER_GPU
