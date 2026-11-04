@@ -56,7 +56,7 @@ tbody th{font-weight:400;color:var(--soft);text-align:left}
 <div style="display:flex;flex-direction:column;gap:6px">
 <p class="eyebrow mono">ORBITAL COMPUTE SIM · __ORBIT__ · UPDATED __UPDATED__</p>
 <h1>SAT-01 Mission Board</h1>
-<p class="muted" style="margin:0">Same satellite, different schedulers. Averages of __N__ unseen 6-hour runs per weather type.</p>
+<p class="muted" style="margin:0">A fleet of solar-powered GPU satellites: sharing jobs, real AI workloads, and fleets of 12 to 96. Pick a weather type to update the panels.</p>
 </div>
 <div class="seg" role="group" aria-label="Space weather" id="seg"></div>
 </header>
@@ -66,7 +66,45 @@ tbody th{font-weight:400;color:var(--soft);text-align:left}
 <h2>The fleet in orbit</h2>
 <iframe id="orbitframe" title="Animated view of the satellite fleet orbiting Earth" style="width:100%;height:1050px;border:0;border-radius:10px;background:#070B14" loading="lazy" srcdoc="__ORBITDOC__"></iframe>
 </section>
-<div class="cards" id="cards"></div>
+<section class="panel" id="scalebox" style="display:none;flex-direction:column;gap:12px">
+<p class="eyebrow mono">AI1 SPECS · 53° ORBIT · FLEET SIZE TEST</p>
+<h2>Bigger fleets: 12, 48 and 96 satellites</h2>
+<p class="muted" style="margin:0;font-size:14px" id="scalelead"></p>
+<div class="tablebox"><table id="stbl"></table></div>
+<div class="tablebox"><table id="atbl"></table></div>
+<p class="muted" style="margin:0;font-size:14px">Sharing = shared queue vs. each satellite alone, demand scaled to fleet size. AI edge = trained dispatcher vs. the best simple rule on an aging fleet (one in three satellites worn), fresh test runs, realistic weather mix. Dollars per 1,000 satellites per year, H100 low to B200 high.</p>
+</section>
+<section class="panel" id="heliosbox" style="display:none;flex-direction:column;gap:12px">
+<p class="eyebrow mono">REAL AI JOBS · HELIOS GPU TRACE · AI1 SPECS · 53° ORBIT</p>
+<h2>Sharing on real AI workloads</h2>
+<p class="muted" style="margin:0;font-size:14px" id="helioslead"></p>
+<div class="tablebox"><table id="htbl"></table></div>
+<p class="muted" style="margin:0;font-size:14px">Real deep-learning jobs from SenseTime's Helios GPU clusters (2020): real arrival bursts, GPU counts and run times. Gain = GPU work delivered with sharing vs. each satellite alone, averaged over 6 different 12-hour slices of the trace. Demand = work offered as a share of the fleet's full GPU power.</p>
+</section>
+<section class="panel" id="valbox" style="display:none;flex-direction:column;gap:12px">
+<p class="eyebrow mono">WHAT THE EXTRA COMPUTING IS WORTH · AT TODAY'S GPU RENTAL PRICES</p>
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px">
+<h2>What sharing is worth (12-satellite test)</h2>
+<div class="seg" role="group" aria-label="Weather mix" id="mixseg"></div>
+</div>
+<p class="big mono" id="valhead" style="margin:0"></p>
+<p class="muted" style="margin:0;font-size:14px" id="vallead"></p>
+<div class="tablebox"><table id="vtbl"></table></div>
+<p class="muted" style="margin:0;font-size:14px">Range = H100 prices (low end) to B200 prices (high end), per kWh of GPU-server power. Assumes every extra kWh is sold at today's rental prices and uses this setup's estimated satellite design (__GPUKW__ kW of GPUs), not confirmed company specs.</p>
+</section>
+<section class="panel" id="fleetbox" style="display:none;flex-direction:column;gap:12px">
+<p class="eyebrow mono" id="fleetsub"></p>
+<h2>Close-up: one 12-satellite fleet, metric by metric</h2>
+<p class="muted" style="margin:0;font-size:14px" id="fleetlead"></p>
+<p class="muted" style="margin:0;font-size:14px">This detailed test runs at 12 satellites. For 48 and 96 satellites, see <a href="#scalebox">Bigger fleets</a> above.</p>
+<div class="tablebox"><table id="ftbl"></table></div>
+<p class="muted" style="margin:0;font-size:14px" id="fleetnote">Local = each satellite alone. Fleet = shared queue, best-fit packing. Strict = fleet that always pulls sensitive jobs out of the South Atlantic Anomaly radiation zone. AI = learns those settings minute by minute. Best value in each row is highlighted.</p>
+</section>
+<section class="panel" style="display:flex;flex-direction:column;gap:6px">
+<p class="eyebrow mono">CLOSE-UP · ONE SATELLITE ON ITS OWN</p>
+<h2>How one satellite schedules its own work</h2>
+<p class="muted" style="margin:0;font-size:14px">Before any sharing: a single satellite choosing how hard to run its GPUs. These four schedulers are the starting point the fleet results build on.</p>
+</section>
 <section class="panel" style="display:flex;flex-direction:column;gap:12px">
 <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center">
 <h2>Battery over one sample 6-hour run</h2><div class="legend" id="legend"></div></div>
@@ -82,39 +120,7 @@ tbody th{font-weight:400;color:var(--soft);text-align:left}
 <p class="muted" style="margin:0;font-size:14px">Work done = computing actually finished. Score = work minus penalties for low battery, overheating, wasted work and offloading.</p>
 <div class="tablebox"><table id="tbl"></table></div>
 </section>
-<section class="panel" id="fleetbox" style="display:none;flex-direction:column;gap:12px">
-<p class="eyebrow mono" id="fleetsub"></p>
-<h2>Fleet: 12 satellites sharing work over laser links</h2>
-<p class="muted" style="margin:0;font-size:14px" id="fleetlead"></p>
-<div class="tablebox"><table id="ftbl"></table></div>
-<p class="muted" style="margin:0;font-size:14px" id="fleetnote">Local = each satellite alone. Fleet = shared queue, best-fit packing. Strict = fleet that always pulls sensitive jobs out of the South Atlantic Anomaly radiation zone. AI = learns those settings minute by minute. Best value in each row is highlighted.</p>
-</section>
-<section class="panel" id="valbox" style="display:none;flex-direction:column;gap:12px">
-<p class="eyebrow mono">WHAT THE EXTRA COMPUTING IS WORTH · AT TODAY'S GPU RENTAL PRICES</p>
-<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px">
-<h2>Dollar value of the hybrid dispatcher</h2>
-<div class="seg" role="group" aria-label="Weather mix" id="mixseg"></div>
-</div>
-<p class="big mono" id="valhead" style="margin:0"></p>
-<p class="muted" style="margin:0;font-size:14px" id="vallead"></p>
-<div class="tablebox"><table id="vtbl"></table></div>
-<p class="muted" style="margin:0;font-size:14px">Range = H100 prices (low end) to B200 prices (high end), per kWh of GPU-server power. Assumes every extra kWh is sold at today's rental prices and uses this sim's satellite design (100 kW of GPUs), not a real company's.</p>
-</section>
-<section class="panel" id="heliosbox" style="display:none;flex-direction:column;gap:12px">
-<p class="eyebrow mono">REAL AI JOBS · HELIOS GPU TRACE · AI1 SPECS · 53° ORBIT</p>
-<h2>Sharing on real AI workloads</h2>
-<p class="muted" style="margin:0;font-size:14px" id="helioslead"></p>
-<div class="tablebox"><table id="htbl"></table></div>
-<p class="muted" style="margin:0;font-size:14px">Real deep-learning jobs from SenseTime's Helios GPU clusters (2020): real arrival bursts, GPU counts and run times. Gain = GPU work delivered with sharing vs. each satellite alone, averaged over 6 different 12-hour slices of the trace. Demand = work offered as a share of the fleet's full GPU power.</p>
-</section>
-<section class="panel" id="scalebox" style="display:none;flex-direction:column;gap:12px">
-<p class="eyebrow mono">AI1 SPECS · 53° ORBIT · FLEET SIZE TEST</p>
-<h2>Bigger fleets: 12, 48 and 96 satellites</h2>
-<p class="muted" style="margin:0;font-size:14px" id="scalelead"></p>
-<div class="tablebox"><table id="stbl"></table></div>
-<div class="tablebox"><table id="atbl"></table></div>
-<p class="muted" style="margin:0;font-size:14px">Sharing = shared queue vs. each satellite alone, demand scaled to fleet size. AI edge = trained dispatcher vs. the best simple rule on an aging fleet (one in three satellites worn), fresh test runs, realistic weather mix. Dollars per 1,000 satellites per year, H100 low to B200 high.</p>
-</section>
+<div class="cards" id="cards"></div>
 </div>
 <script>
 const DATA = __DATA__;
@@ -165,7 +171,7 @@ function fleetTakeaway(){
   let t=`${lead}, sharing jobs across the fleet does <b>${share>=0?"+":""}${share.toFixed(1)}% more computing</b> than satellites working alone`;
   if(HYB){const h=HYB.results[W], e=h.edge_vs_switch.score;
     t+= h.policy_used==="ai"
-      ? `, and the AI dispatcher adds more on top, beating the best simple rule in ${e.wins} of ${e.runs} fresh runs.`
+      ? `, and on these simulated jobs the AI dispatcher adds more on top, beating the best simple rule in ${e.wins} of ${e.runs} fresh runs.`
       : `. Here a simple rule already captures it, so the dispatcher uses the rule.`;}
   else t+=".";
   if(VAL){const r=VAL.mixes.realistic["vs no sharing"], all=Object.values(r.usd_per_sat_year);
@@ -239,11 +245,12 @@ function renderFleet(){
   const bestBy=k=>[...P].sort((x,y)=>a[y][k]-a[x][k])[0];
   const bw=bestBy("work_kwh"), bs=bestBy("score");
   const gain=((a.fleet.work_kwh/a.local.work_kwh-1)*100).toFixed(1);
-  let lead=`Sharing work does ${gain}% more computing than satellites working alone. Most work: ${FN[bw]}. Best overall score: ${FN[bs]}.`;
-  if(HYB){const h=HYB.results[W], e=h.edge_vs_switch.score;
-    lead+=` Hybrid (AI only where it proved better, simple rule elsewhere), on fresh runs: ${e.mean>=0?"+":""}${e.mean} score vs the best simple rule`+
-      (h.policy_used==="ai"?` (95% range ${e.low} to ${e.high}, won ${e.wins}/${e.runs}).`:` (uses the rule itself here).`)+
-      ` Across a weather mix: +${HYB.gain_vs_local_pct}% work vs no sharing, +${HYB.gain_vs_rule_pct}% vs the best rule.`;}
+  let lead=`${{LOW:"In calm sun",ELEVATED:"During a moderate storm",HIGH:"During a big storm"}[W]}, sharing work does ${gain}% more computing than satellites working alone (simulated jobs).`;
+  const FNL={local:"working alone",fleet:"sharing",strict:"sharing and dodging the radiation zone",ai:"the AI"};
+  lead+= bw===bs ? ` Best here: ${FNL[bw]}.` : ` Most work: ${FNL[bw]}. Best overall: ${FNL[bs]}.`;
+  if(HYB){const h=HYB.results[W];
+    lead+= h.policy_used==="ai" ? ` In fresh test runs the AI beat the best simple rule in ${h.edge_vs_switch.score.wins} of ${h.edge_vs_switch.score.runs}.`
+                                : ` The AI didn't beat the best simple rule here, so the dispatcher uses the rule.`;}
   $("fleetlead").textContent=lead;
   const rows=[["Work done (kWh)","work_kwh",0,1],["Overall score","score",1,1],["Avg job delay (min)","avg_delay_min",1,-1],
     ["Bit-flip restarts","restarts",1,-1],["Wasted work (kWh)","wasted_kwh",0,-1],["Jobs moved between satellites","moves",0,0]];
@@ -359,7 +366,7 @@ def build(results="rl_results.json", out="dashboard.html"):
             .replace("__ORBITDOC__", orbit_doc).replace("__HAS_ORBIT__", "true" if has_orbit else "false")
             .replace("__DATA__", data).replace("__FLEET__", fleet_js).replace("__HYB__", hyb_js).replace("__VAL__", val_js)
             .replace("__ORBIT__", __import__("sat_profile").LABEL.upper())
-            .replace("__N__", str(d.get("episodes_per_level", 20)))
+            .replace("__N__", str(d.get("episodes_per_level", 20))).replace("__GPUKW__", f"{__import__('power_thermal').SAT['gpu_max_kw']:.0f}")
             .replace("__UPDATED__", datetime.now().strftime("%b %d %Y %I:%M %p").upper()))
     with open(out, "w", encoding="utf-8") as f:
         f.write(html)

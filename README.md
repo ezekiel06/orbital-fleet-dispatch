@@ -15,8 +15,8 @@ battery, and radiator figures in `sat_profile.py` and rerun.
 
 ## Headline results
 
-All results: 12-satellite fleet, 6-hour runs on held-out orbits, every scheduler compared on
-identical runs, 95% ranges by bootstrap. Dollar figures use today's GPU rental prices
+Sections 1–2 use a 12-satellite fleet; sections 3–5 cover 48 and 96 satellites, laser-link limits
+and real AI jobs. Every test uses held-out orbits, every scheduler is compared on identical runs, 95% ranges by bootstrap. Dollar figures use today's GPU rental prices
 (H100 low end, B200 high end) and assume every extra kWh of computing is sold.
 
 ### 1. Sharing work across the fleet: ~5% more computing
@@ -198,7 +198,7 @@ run `python satnogs_fetch.py`, then `python canvas_analysis.py`.
 | 4 | `radiation.py` | Bit-flip rates calibrated from Google's TPU radiation tests |
 | 5 | `scheduler.py` | Hand-written rules baseline |
 | 6 | `rl_env.py`, `train_rl.py`, `evaluate_rl.py` | Single-satellite AI with a hard safety limit |
-| 7 | `fleet.py`, `fleet_rl.py` | 12-satellite fleet, laser-link sharing, fleet AI |
+| 7 | `fleet.py`, `fleet_rl.py` | Satellite fleet (12, 48 or 96), laser-link sharing, fleet AI |
 | 8 | `confirm_fleet.py`, `hybrid.py` | Paired 40-run tests; AI used only where it proved better |
 | 9 | `value.py`, `savings.py` | Money made (extra computing) and saved (battery mass) |
 | — | `scale_test.py` | Sharing gain at 12 / 48 / 96 satellites |
