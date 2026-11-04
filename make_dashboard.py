@@ -81,6 +81,19 @@ tbody th{font-weight:400;color:var(--soft);text-align:left}
 <div class="tablebox"><table id="htbl"></table></div>
 <p class="muted" style="margin:0;font-size:14px">Real deep-learning jobs from SenseTime's Helios GPU clusters (2020): real arrival bursts, GPU counts and run times. Gain = GPU work delivered with sharing vs. each satellite alone, averaged over 6 different 12-hour slices of the trace. Demand = work offered as a share of the fleet's full GPU power.</p>
 </section>
+<section class="panel" id="eqxbox" style="display:none;flex-direction:column;gap:12px">
+<p class="eyebrow mono">HEAD TO HEAD · EQUINOX (GEORGIA TECH, 2026) · AI1 SPECS · 53° ORBIT</p>
+<h2>Ours vs. Equinox, a published orbital scheduler</h2>
+<p class="muted" style="margin:0;font-size:14px" id="eqxlead"></p>
+<div style="display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--soft)" aria-hidden="true">
+<span style="display:flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:3px;background:#D97706;display:inline-block"></i>Ours</span>
+<span style="display:flex;align-items:center;gap:6px"><i style="width:12px;height:12px;border-radius:3px;background:#3B82F6;display:inline-block"></i>Equinox</span>
+<span class="muted">Bars: more GPU work than each satellite working alone</span></div>
+<div style="position:relative;overflow-x:auto"><svg id="eqxchart" viewBox="0 0 900 330" style="width:100%;min-width:560px;height:auto;display:block" role="img"></svg>
+<div id="eqxtip" class="mono" style="position:absolute;display:none;pointer-events:none;background:#0B1220;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text);white-space:nowrap"></div></div>
+<div class="tablebox"><table id="eqxtbl"></table></div>
+<p class="muted" style="margin:0;font-size:14px">Fair test: Equinox rebuilt from its paper (arXiv 2604.19958) inside this simulator, with every unclear choice set in its favor; same orbits, jobs and weather for both; 6 paired runs per case and weather. Caveats: this is a rebuild, not their code, and Equinox was designed for short Earth-imaging tasks rather than long AI jobs.</p>
+</section>
 <section class="panel" id="valbox" style="display:none;flex-direction:column;gap:12px">
 <p class="eyebrow mono">WHAT THE EXTRA COMPUTING IS WORTH · AT TODAY'S GPU RENTAL PRICES</p>
 <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px">
@@ -129,6 +142,7 @@ const HYB = __HYB__;
 const VAL = __VAL__;
 const SCALE = __SCALE__;
 const HELIOS = __HELIOS__;
+const EQX = __EQX__;
 let MIX = "realistic";
 const MIXNAME = {realistic:"Realistic weather", stormy:"Stormy weather"};
 const MIXDESC = {realistic:"calm 90%, moderate storm 8%, big storm 2% of the time", stormy:"calm 50%, moderate 25%, big storm 25% (the harsh training mix)"};
@@ -270,6 +284,41 @@ function renderHelios(){
   $("htbl").innerHTML=`<thead><tr><th scope="col">Case</th>${["Calm sun","Moderate storm","Big storm"].map(n=>`<th scope="col">${n}</th>`).join("")}</tr></thead><tbody>`+
     keys.map(k=>`<tr><th scope="row">${label(k)}</th>${["LOW","ELEVATED","HIGH"].map(w=>{const v=HELIOS[k][w]; return `<td class="mono"${w===W?' style="color:#F5C66B;font-weight:700"':""}>${pct(v.gain_pct)} <span class="muted">(${v.wins}/${v.runs})</span></td>`}).join("")}</tr>`).join("")+"</tbody>";
 }
+function renderEqx(){
+  if(!EQX) return;
+  $("eqxbox").style.display="flex";
+  const CASES=[["made-up · 12 sats","Made-up jobs · 12 sats"],["made-up · 48 sats","Made-up jobs · 48 sats"],["made-up · 48 sats · aging","Made-up jobs · 48 sats, aging"],["real jobs · 12 sats","Real AI jobs · 12 sats"],["real jobs · 48 sats","Real AI jobs · 48 sats"]].filter(([k])=>EQX[k]);
+  let wins=0, runs=0; Object.values(EQX).forEach(c=>["LOW","ELEVATED","HIGH"].forEach(w=>{wins+=c[w].ours_wins; runs+=c[w].runs;}));
+  const pct=v=>`${v>=0?"+":"−"}${Math.abs(v).toFixed(1)}%`;
+  const rw=CASES.map(([k])=>EQX[k][W]);
+  const best=rw.reduce((a,b)=>b.ours_vs_equinox>a.ours_vs_equinox?b:a);
+  $("eqxlead").textContent=`Ours won ${wins} of ${runs} matched runs across all tests. ${{LOW:"In calm sun",ELEVATED:"During a moderate storm",HIGH:"During a big storm"}[W]}, ours did ${pct(Math.min(...rw.map(r=>r.ours_vs_equinox)))} to ${pct(Math.max(...rw.map(r=>r.ours_vs_equinox)))} more work than Equinox. Ours plans ahead for Earth's shadow and keeps sensitive work out of the radiation zone, which Equinox doesn't model.`;
+  // chart: horizontal bars about zero, two per case
+  const L=230, R=860, top=14, rowH=58, bh=18, gap=2;
+  const vals=rw.flatMap(r=>[r.ours_vs_local,r.equinox_vs_local]);
+  const lo=Math.min(-2,Math.floor(Math.min(...vals)/2)*2), hi=Math.max(2,Math.ceil(Math.max(...vals)/2)*2);
+  const x=v=>L+(v-lo)/(hi-lo)*(R-L), H=top+CASES.length*rowH;
+  let g=`<g font-size="12" fill="#9AA6BF" font-family="ui-monospace,Consolas,monospace">`;
+  for(let t=lo;t<=hi;t+=2){ g+=`<line x1="${x(t)}" y1="${top-4}" x2="${x(t)}" y2="${H}" stroke="${t===0?"#5B6B88":"#1B2539"}" stroke-width="${t===0?1.5:1}"/><text x="${x(t)}" y="${H+18}" text-anchor="middle">${t>0?"+":""}${t}%</text>`; }
+  g+=`</g>`;
+  const bar=(v,y,col,label,who,k)=>{const x0=x(0), x1=x(v), w=Math.abs(x1-x0), r=Math.min(4,w/2);
+    const xs=Math.min(x0,x1); const d = v>=0
+      ? `M${xs},${y} h${w-r} q${r},0 ${r},${r} v${bh-2*r} q0,${r} -${r},${r} h-${w-r} z`
+      : `M${x0},${y} h-${w-r} q-${r},0 -${r},${r} v${bh-2*r} q0,${r} ${r},${r} h${w-r} z`;
+    const tx = v>=0 ? x1+6 : x1-6, anc = v>=0 ? "start":"end";
+    return `<g class="eqxbar" data-tip="${label}: ${who} ${pct(v)} vs working alone"><rect x="${L}" y="${y-2}" width="${R-L}" height="${bh+4}" fill="transparent"/><path d="${d}" fill="${col}"/><text x="${tx}" y="${y+bh-5}" font-size="12" fill="#C3CCDD" text-anchor="${anc}" font-family="ui-monospace,Consolas,monospace">${pct(v)}</text></g>`;};
+  CASES.forEach(([k,label],i)=>{const r=EQX[k][W], y=top+i*rowH;
+    g+=`<text x="${L-12}" y="${y+bh+2}" text-anchor="end" font-size="13" fill="#C3CCDD">${label}</text>`;
+    g+=bar(r.ours_vs_local,y,"#D97706",label,"Ours",k)+bar(r.equinox_vs_local,y+bh+gap,"#3B82F6",label,"Equinox",k);});
+  const svg=$("eqxchart"); svg.setAttribute("viewBox",`0 0 900 ${H+28}`); svg.innerHTML=g;
+  svg.setAttribute("aria-label",`Bar chart, ${{LOW:"calm sun",ELEVATED:"moderate storm",HIGH:"big storm"}[W]}: extra GPU work vs working alone for ours and Equinox in each case; details in the table below.`);
+  const tip=$("eqxtip");
+  svg.querySelectorAll(".eqxbar").forEach(el=>{
+    el.addEventListener("mousemove",e=>{const b=svg.parentNode.getBoundingClientRect(); tip.textContent=el.dataset.tip; tip.style.display="block"; tip.style.left=(e.clientX-b.left+12+svg.parentNode.scrollLeft)+"px"; tip.style.top=(e.clientY-b.top-34)+"px";});
+    el.addEventListener("mouseleave",()=>{tip.style.display="none";});});
+  $("eqxtbl").innerHTML=`<thead><tr><th scope="col">Case (${NAMES[W].toLowerCase()})</th><th scope="col">Ours vs. alone</th><th scope="col">Equinox vs. alone</th><th scope="col">Ours vs. Equinox</th><th scope="col">Runs ours won</th></tr></thead><tbody>`+
+    CASES.map(([k,label])=>{const r=EQX[k][W]; return `<tr><th scope="row">${label}</th><td class="mono">${pct(r.ours_vs_local)}</td><td class="mono">${pct(r.equinox_vs_local)}</td><td class="mono" style="color:#F5C66B;font-weight:700">${pct(r.ours_vs_equinox)}</td><td class="mono">${r.ours_wins} of ${r.runs}</td></tr>`}).join("")+"</tbody>";
+}
 function renderScale(){
   if(!SCALE) return;
   $("scalebox").style.display="flex";
@@ -282,8 +331,8 @@ function renderScale(){
   const last=sizes[sizes.length-1];
   $("scalelead").textContent=`Sharing gets better as the fleet grows: ${pct(SCALE.sharing[sizes[0]][0])} at ${sizes[0]} satellites, ${pct(SCALE.sharing[last][0])} at ${last} (calm sun). More satellites means more places to send each job.`;
 }
-$("seg").addEventListener("click", e=>{const b=e.target.closest("button"); if(b){W=b.dataset.w; render(); renderFleet(); renderHelios();}});
-render(); renderFleet(); renderValue(); renderScale(); renderHelios();
+$("seg").addEventListener("click", e=>{const b=e.target.closest("button"); if(b){W=b.dataset.w; render(); renderFleet(); renderHelios(); renderEqx();}});
+render(); renderFleet(); renderValue(); renderScale(); renderHelios(); renderEqx();
 if (__HAS_ORBIT__) $("orbitbox").style.display = "flex";
 addEventListener("message", e => { if (e.data && e.data.orbitHeight) $("orbitframe").style.height = e.data.orbitHeight + "px"; });
 </script></body></html>
@@ -329,6 +378,12 @@ def load_orbit():
     return html.escape(doc, quote=True), True
 
 
+def load_equinox():
+    import os
+    p = next((p for p in ("equinox_results.json", "results/equinox/equinox_results.json") if os.path.exists(p)), None)
+    return json.load(open(p)) if p else None
+
+
 def load_helios():
     import os
     p = next((p for p in ("helios_results.json", "results/helios/helios_results.json") if os.path.exists(p)), None)
@@ -361,7 +416,8 @@ def build(results="rl_results.json", out="dashboard.html"):
         hyb_js = "null"
     scale = load_scale()
     orbit_doc, has_orbit = load_orbit()
-    html = (TEMPLATE.replace("__HELIOS__", json.dumps(load_helios(), separators=(",", ":")))
+    html = (TEMPLATE.replace("__EQX__", json.dumps(load_equinox(), separators=(",", ":")))
+            .replace("__HELIOS__", json.dumps(load_helios(), separators=(",", ":")))
             .replace("__SCALE__", json.dumps(scale, separators=(",", ":")).replace("</", "<\\/"))
             .replace("__ORBITDOC__", orbit_doc).replace("__HAS_ORBIT__", "true" if has_orbit else "false")
             .replace("__DATA__", data).replace("__FLEET__", fleet_js).replace("__HYB__", hyb_js).replace("__VAL__", val_js)
