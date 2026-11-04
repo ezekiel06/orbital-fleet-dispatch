@@ -26,3 +26,4 @@ fleet_results.json
 # Helios trace (fetch with python workload.py)
 helios_src/
 helios_jobs.npz
+.pytest_cache/

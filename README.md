@@ -1,5 +1,7 @@
 # Orbital Fleet Dispatch
 
+[![tests](https://github.com/ezekiel06/orbital-fleet-dispatch/actions/workflows/tests.yml/badge.svg)](https://github.com/ezekiel06/orbital-fleet-dispatch/actions/workflows/tests.yml)
+
 An open-source simulator for **AI data centers in orbit**: how much computing a fleet of
 solar-powered GPU satellites can deliver, and how much better scheduling recovers, without
 wearing out batteries or cooking chips.
@@ -170,7 +172,7 @@ python run_all.py --refresh    # download today's Starlink orbits first
 python run_all.py --extended   # also the 12/48/96-satellite, laser-link and real-job tests (~1 hour)
 ```
 
-Then open `dashboard.html`.
+Then open `dashboard.html`. Quick checks of the core behavior: `pytest -q` (seconds; GitHub runs them on every change).
 
 **Other setups.** Set `SAT_PROFILE` before running:
 
