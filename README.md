@@ -129,7 +129,33 @@ to call in all three weather levels (`results/helios_ai_48/`). The AI's +2–3% 
 holds for the made-up jobs only. On real jobs, the recommendation is the weather-aware rule, which
 gives +7.9% over no sharing in stormy weather.
 
-### 6. Money saved at launch: less battery to fly
+### 6. Head to head with a published scheduler: Equinox
+
+[Equinox](https://arxiv.org/abs/2604.19958) (Erol & Mahajan, Georgia Tech, April 2026) prices each
+satellite's work from its battery, temperature and queue, runs work only when it's worth that
+price, and hops leftover jobs one step over a laser link to a cheaper neighbor. It reports 20% more
+useful work than a priority baseline. We rebuilt it from the paper in `fleet.py` (mode `equinox`),
+setting every unclear choice in its favor, and ran it on the same orbits, jobs and weather
+(`equinox_test.py`; AI1 specs, 53°, 6 runs per weather). Gain over satellites working alone with our
+battery rules, calm / moderate / big storm:
+
+| Case | Ours | Equinox | Ours vs. Equinox, runs won |
+| --- | --- | --- | --- |
+| Made-up jobs, 12 satellites | +3.4 / +3.2 / +2.6% | +0.7 / +0.5 / +0.2% | 17 of 18 |
+| Made-up jobs, 48 satellites | +4.6 / +4.4 / +3.8% | +1.7 / +1.9 / +0.6% | 18 of 18 |
+| Made-up jobs, 48 satellites, aging fleet | +4.0 / +3.9 / +3.6% | +1.8 / +1.5 / +0.0% | 18 of 18 |
+| Real AI jobs, 12 satellites | +6.3 / +7.9 / +7.8% | +2.8 / +3.3 / −8.4% | 17 of 18 |
+| Real AI jobs, 48 satellites | +8.9 / +7.5 / +5.6% | +3.8 / +1.2 / −5.7% | 18 of 18 |
+
+Ours won 140 of 144 paired runs across all cases, and no battery went below its floor under either.
+Two reasons: ours plans ahead for the next shadow instead of reacting as the battery drops, and it
+steers error-sensitive work out of the South Atlantic Anomaly, which Equinox doesn't model, so long
+real jobs lose much more to restarts under Equinox in big storms. Raising Equinox's job value from 4
+to 8 narrows the big-storm gap to +1% (4 of 6 runs). **Caveats:** this is our rebuild, not their
+code; Equinox was designed for short Earth-observation inference tasks, not long AI jobs; and our
+"working alone" baseline already plans for shadow, unlike the priority baseline in their paper.
+
+### 7. Money saved at launch: less battery to fly
 
 A sharing fleet matches a non-sharing fleet's output with **~51 kWh less battery per satellite**
 (240 → ~189 kWh). That's **300–424 kg** per satellite (at 170 / 120 Wh/kg space battery packs):
@@ -139,14 +165,14 @@ A sharing fleet matches a non-sharing fleet's output with **~51 kWh less battery
 | $100/kg (Starship target) | $30M – $42M |
 | $1,000/kg (illustrative early Starship) | $300M – $424M |
 
-### 7. Design checks on SpaceX's reported AI1 numbers
+### 8. Design checks on SpaceX's reported AI1 numbers
 
 - A 110 m² radiator works only if it sheds heat from **both faces**: it settles near 58 °C at
   120 kW, versus ~121 °C on one face (`radiator_check.py`).
 - Keeping ~99% of full output through Earth's shadow on a 53° orbit takes **~240 kWh** of
   battery with a 70% floor (`battery_sizing.py`).
 
-### 8. Problem detection on real ESA telemetry
+### 9. Problem detection on real ESA telemetry
 
 On ESA's OPS-SAT anomaly benchmark, a supervised model catches 102 of 113 real problems
 (F1 0.91) vs. 61 for fixed alarm limits, close to the paper's published Random Forest result.
@@ -211,6 +237,7 @@ run `python satnogs_fetch.py`, then `python canvas_analysis.py`.
 | — | `scale_test.py` | Sharing gain at 12 / 48 / 96 satellites |
 | — | `link_test.py` | Sharing gain with real laser-link speed limits |
 | — | `workload.py`, `helios_test.py` | Real AI jobs from the Helios GPU trace |
+| — | `equinox_test.py` | Head to head with Equinox, a published orbital scheduler |
 | 10 | `radiator_check.py`, `battery_sizing.py` | Design checks |
 | 11 | `telemetry_check.py`, `satnogs_fetch.py`, `canvas_analysis.py` | Real telemetry |
 | — | `sat_profile.py` | Satellite and orbit setups; put your own specs here |
@@ -250,6 +277,10 @@ Other open projects model orbital compute from different angles, and they're wor
   energy-aware vs. least-loaded scheduling.
 - [Celestial](https://arxiv.org/abs/2204.06282): virtual testbeds for software on LEO edge
   satellites.
+- [Equinox](https://arxiv.org/abs/2604.19958): decentralized, battery- and heat-aware scheduling of
+  onboard AI tasks with laser-link offloading (compared head to head in section 6).
+- [Constraint-Aware Execution](https://arxiv.org/abs/2605.04052) (RotaStellar): planning which
+  steps of a workload run in orbit vs. on the ground around eclipses and ground-station passes.
 
 What this project adds: a reinforcement-learning dispatcher tested head to head against simple
 rules (including where it loses), checks against real satellite telemetry (ESA OPS-SAT,

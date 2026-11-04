@@ -70,6 +70,42 @@ JOB_IN_GB = float(_os.environ.get("SAT_JOB_IN_GB", "0"))
 SMART_MOVES = _os.environ.get("SAT_MOVE", "smart") == "smart"
 
 
+# Equinox (Erol & Mahajan, Georgia Tech, arXiv:2604.19958, Apr 2026), rebuilt for comparison.
+# Each satellite prices its own work: P = 1.40 x f_batt x f_thermal x f_queue, with
+#   f_batt  = 1 + 0.001 / (SoC - SoC_c)^2        (SoC_c = our 70% floor, the level never to reach)
+#   f_therm = 1 + g_T (T - 50)^2 / ((85 - T)^2 + 1)   (g_T not stated in the paper; we use 0.1)
+#   f_queue = 1 + 0.01 x (jobs waiting on that satellite)
+# A satellite runs work only while the job's value beats P (value = EQX_VALUE, default 4.0,
+# the middle of the paper's task values), and never draws its battery below SoC_c. A job that
+# can't run where it arrived hops once to the satellite with the lowest P_phys (no queue term)
+# if P_n + 0.05 P_local + 0.10 < P_local. Choices that favor Equinox: every satellite counts as
+# a neighbor (the paper uses those within 5,000 km), and waiting jobs never expire (the paper
+# drops them after 300 s); the queue term counts only jobs waiting 5 minutes or less, matching
+# the paper's 300-second queue, and a job that hasn't started hops with no transfer delay.
+EQX_VALUE = float(_os.environ.get("EQX_VALUE", "4.0"))
+EQX_GAMMA_T = float(_os.environ.get("EQX_GAMMA_T", "0.1"))
+
+
+def eqx_cost(sat, queue_len=0):
+    p = sat.p
+    soc = sat.batt / p["battery_kwh"]
+    gap = max(soc - p["battery_floor"], 1e-3)
+    t = sat.temp_k - 273.15
+    f_b = 1 + 0.001 / gap ** 2
+    f_t = 1 + EQX_GAMMA_T * (t - 50) ** 2 / ((85 - t) ** 2 + 1) if t > 50 else 1.0
+    return 1.40 * f_b * f_t * (1 + 0.01 * queue_len)
+
+
+def eqx_budget(sat, i, queue_len):
+    """GPU power Equinox lets this satellite use this minute."""
+    p = sat.p
+    if eqx_cost(sat, queue_len) >= EQX_VALUE:
+        return 0.0
+    gen = p["solar_kw"] if sat.lit[i] else 0.0
+    spare_kwh = sat.batt - p["battery_kwh"] * p["battery_floor"]
+    return max(0.0, min(p["gpu_max_kw"], spare_kwh * 60 + gen - p["bus_kw"]))
+
+
 def _worth_moving(j, sat, i, transfer):
     """Is moving this job cheaper than letting it wait?"""
     if not LINK or not SMART_MOVES:
@@ -270,12 +306,19 @@ def simulate(mode, lit, saa, names, weather, minutes, seed):
                 up += gb
             j = by_arrival[nxt]; nxt += 1
             j["state"] = "queued"
-            if mode == "local":
+            if mode in ("local", "equinox"):
                 j["sat"] = rr % len(sats); rr += 1
         mult_weather = ERROR_MULT[weather]
 
         # 2. each satellite's safe budget; drop running jobs that no longer fit
-        budgets = [s.safe_budget(i) for s in sats]
+        if mode == "equinox":
+            qlen = [0] * len(sats)
+            for j in jobs:  # the paper's queue holds work deferred within the last 300 s
+                if j["state"] == "queued" and j["sat"] is not None and i - j["arrive"] <= 5:
+                    qlen[j["sat"]] += 1
+            budgets = [eqx_budget(s, i, qlen[si]) for si, s in enumerate(sats)]
+        else:
+            budgets = [s.safe_budget(i) for s in sats]
         for si, s in enumerate(sats):
             keep, used = [], 0
             for j in sorted(s.running, key=lambda x: x["kw"]):
@@ -293,7 +336,7 @@ def simulate(mode, lit, saa, names, weather, minutes, seed):
             if j["hold"] > 0:
                 j["hold"] -= 1
                 continue
-            if mode == "local":
+            if mode in ("local", "equinox"):
                 tiers = [[j["sat"]]]
             else:
                 allc = list(range(len(sats)))
@@ -323,6 +366,24 @@ def simulate(mode, lit, saa, names, weather, minutes, seed):
                 j["prev"] = None
                 j["sat"] = best; j["state"] = "running"
                 sats[best].running.append(j)
+            elif mode == "equinox" and not j.get("hopped"):
+                # can't run where it is: one hop to the cheapest neighbor, if worth the link cost
+                here = j["sat"]
+                p_local = eqx_cost(sats[here])
+                tgt, p_best = None, None
+                for c, t in enumerate(sats):
+                    if c == here or budgets[c] - sum(x["kw"] for x in t.running) < j["kw"]:
+                        continue
+                    p_n = eqx_cost(t)
+                    if p_n + 0.05 * p_local + 0.10 < p_local and p_n < EQX_VALUE and (p_best is None or p_n < p_best):
+                        tgt, p_best = c, p_n
+                if tgt is not None and can_send(here, _state_gb(j)):
+                    moves += 1; j["hopped"] = True
+                    # a job that hasn't started has nothing to carry over (as for our first placement)
+                    if j["done_min"] > 0:
+                        j["stall"] = send(here, _state_gb(j)) if LINK else MOVE_DELAY_MIN
+                    j["sat"] = tgt; j["state"] = "running"
+                    sats[tgt].running.append(j)
 
         # 3b. FLEET: hand sensitive jobs off satellites inside the SAA, if a clean one has room
         if mode == "fleet":

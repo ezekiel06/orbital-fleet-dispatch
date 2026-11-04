@@ -1,0 +1,546 @@
+{
+ "made-up \u00b7 12 sats": {
+  "LOW": {
+   "ours_vs_local": 3.3926330019939313,
+   "equinox_vs_local": 0.745907557214794,
+   "ours_vs_equinox": 2.6247802093636823,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 44.1,
+    "fleet": 21.316666666666666,
+    "equinox": 42.1
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 76.5,
+    "equinox": 318.1666666666667
+   }
+  },
+  "ELEVATED": {
+   "ours_vs_local": 3.174013738412292,
+   "equinox_vs_local": 0.5440440632677956,
+   "ours_vs_equinox": 2.617468057904955,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 48.46666666666667,
+    "fleet": 23.91666666666666,
+    "equinox": 53.78333333333334
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 73.33333333333333,
+    "equinox": 309.0
+   }
+  },
+  "HIGH": {
+   "ours_vs_local": 2.557253505284318,
+   "equinox_vs_local": 0.22967821764809196,
+   "ours_vs_equinox": 2.3307796045472045,
+   "ours_wins": 5,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 60.383333333333326,
+    "fleet": 32.03333333333334,
+    "equinox": 73.96666666666667
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 80.83333333333333,
+    "equinox": 333.6666666666667
+   }
+  }
+ },
+ "made-up \u00b7 48 sats": {
+  "LOW": {
+   "ours_vs_local": 4.6221713523712324,
+   "equinox_vs_local": 1.6843597877998866,
+   "ours_vs_equinox": 2.88915510536117,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 42.68333333333334,
+    "fleet": 16.766666666666666,
+    "equinox": 41.300000000000004
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 271.8333333333333,
+    "equinox": 1804.5
+   }
+  },
+  "ELEVATED": {
+   "ours_vs_local": 4.366254385623018,
+   "equinox_vs_local": 1.936225538452289,
+   "ours_vs_equinox": 2.3836832155143024,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 47.48333333333333,
+    "fleet": 19.916666666666664,
+    "equinox": 46.70000000000001
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 275.5,
+    "equinox": 1874.6666666666667
+   }
+  },
+  "HIGH": {
+   "ours_vs_local": 3.8028892732479966,
+   "equinox_vs_local": 0.6316767274022157,
+   "ours_vs_equinox": 3.152803448890318,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 60.81666666666667,
+    "fleet": 27.799999999999997,
+    "equinox": 70.16666666666667
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 281.5,
+    "equinox": 1876.1666666666667
+   }
+  }
+ },
+ "made-up \u00b7 12 sats \u00b7 aging": {
+  "LOW": {
+   "ours_vs_local": 3.465639724762648,
+   "equinox_vs_local": 1.057069274915571,
+   "ours_vs_equinox": 2.3849513898781356,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 4
+   },
+   "delay": {
+    "local": 44.083333333333336,
+    "fleet": 23.416666666666668,
+    "equinox": 53.75
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 91.66666666666667,
+    "equinox": 365.5
+   }
+  },
+  "ELEVATED": {
+   "ours_vs_local": 2.6760011738244533,
+   "equinox_vs_local": 0.2594053030700427,
+   "ours_vs_equinox": 2.415164442422883,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 7
+   },
+   "delay": {
+    "local": 48.96666666666666,
+    "fleet": 26.366666666666664,
+    "equinox": 62.15
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 91.83333333333333,
+    "equinox": 351.8333333333333
+   }
+  },
+  "HIGH": {
+   "ours_vs_local": 1.9892987069516255,
+   "equinox_vs_local": -0.4572866936819575,
+   "ours_vs_equinox": 2.4795804640146635,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 22
+   },
+   "delay": {
+    "local": 59.01666666666667,
+    "fleet": 33.86666666666667,
+    "equinox": 82.38333333333334
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 92.83333333333333,
+    "equinox": 362.3333333333333
+   }
+  }
+ },
+ "made-up \u00b7 48 sats \u00b7 aging": {
+  "LOW": {
+   "ours_vs_local": 3.9925240282314998,
+   "equinox_vs_local": 1.8447834581584683,
+   "ours_vs_equinox": 2.110128410681518,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 9
+   },
+   "delay": {
+    "local": 42.65,
+    "fleet": 20.0,
+    "equinox": 48.166666666666664
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 410.3333333333333,
+    "equinox": 2018.8333333333333
+   }
+  },
+  "ELEVATED": {
+   "ours_vs_local": 3.9166832451043576,
+   "equinox_vs_local": 1.475354858635447,
+   "ours_vs_equinox": 2.4069779938300324,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 12
+   },
+   "delay": {
+    "local": 46.75,
+    "fleet": 22.383333333333336,
+    "equinox": 55.11666666666667
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 422.0,
+    "equinox": 2029.8333333333333
+   }
+  },
+  "HIGH": {
+   "ours_vs_local": 3.622041661451706,
+   "equinox_vs_local": 0.007994359096215781,
+   "ours_vs_equinox": 3.6195128112911035,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 12
+   },
+   "delay": {
+    "local": 58.96666666666667,
+    "fleet": 29.333333333333332,
+    "equinox": 80.21666666666668
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 433.3333333333333,
+    "equinox": 1932.1666666666667
+   }
+  }
+ },
+ "real jobs \u00b7 12 sats": {
+  "LOW": {
+   "ours_vs_local": 6.281061451426871,
+   "equinox_vs_local": 2.789032968216139,
+   "ours_vs_equinox": 3.3585160527327482,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 5.833333333333333,
+    "fleet": 5.7,
+    "equinox": 14.183333333333332
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 550.8333333333334,
+    "equinox": 812.5
+   }
+  },
+  "ELEVATED": {
+   "ours_vs_local": 7.919123578323554,
+   "equinox_vs_local": 3.255503612439455,
+   "ours_vs_equinox": 4.393214577560341,
+   "ours_wins": 5,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 6.566666666666667,
+    "fleet": 5.283333333333333,
+    "equinox": 14.700000000000001
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 544.5,
+    "equinox": 836.3333333333334
+   }
+  },
+  "HIGH": {
+   "ours_vs_local": 7.814075069379712,
+   "equinox_vs_local": -8.351385326819642,
+   "ours_vs_equinox": 17.66472277554948,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 7.5,
+    "fleet": 6.416666666666667,
+    "equinox": 20.5
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 510.1666666666667,
+    "equinox": 888.6666666666666
+   }
+  }
+ },
+ "real jobs \u00b7 48 sats": {
+  "LOW": {
+   "ours_vs_local": 8.905228962304168,
+   "equinox_vs_local": 3.7543154261828837,
+   "ours_vs_equinox": 5.005776201936115,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 6.216666666666668,
+    "fleet": 3.883333333333333,
+    "equinox": 14.216666666666667
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 2979.5,
+    "equinox": 3600.3333333333335
+   }
+  },
+  "ELEVATED": {
+   "ours_vs_local": 7.535348812754368,
+   "equinox_vs_local": 1.2491475929003424,
+   "ours_vs_equinox": 6.235861899697481,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 6.166666666666667,
+    "fleet": 4.7,
+    "equinox": 14.366666666666665
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 2986.0,
+    "equinox": 3629.5
+   }
+  },
+  "HIGH": {
+   "ours_vs_local": 5.630942978917744,
+   "equinox_vs_local": -5.6810953544043645,
+   "ours_vs_equinox": 12.107902724866566,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 7.5,
+    "fleet": 5.216666666666667,
+    "equinox": 17.183333333333334
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 2812.5,
+    "equinox": 3533.1666666666665
+   }
+  }
+ },
+ "made-up \u00b7 12 sats \u00b7 Equinox value 2": {
+  "LOW": {
+   "ours_vs_local": 3.3926330019939313,
+   "equinox_vs_local": -0.6325492828497554,
+   "ours_vs_equinox": 4.049499572484442,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 44.1,
+    "fleet": 21.316666666666666,
+    "equinox": 46.68333333333334
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 76.5,
+    "equinox": 326.6666666666667
+   }
+  },
+  "ELEVATED": {
+   "ours_vs_local": 3.174013738412292,
+   "equinox_vs_local": -0.5305164820903541,
+   "ours_vs_equinox": 3.724216664288449,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 48.46666666666667,
+    "fleet": 23.91666666666666,
+    "equinox": 53.75
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 73.33333333333333,
+    "equinox": 325.8333333333333
+   }
+  },
+  "HIGH": {
+   "ours_vs_local": 2.557253505284318,
+   "equinox_vs_local": -0.8248756790213733,
+   "ours_vs_equinox": 3.4353571589596434,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 60.383333333333326,
+    "fleet": 32.03333333333334,
+    "equinox": 79.66666666666667
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 80.83333333333333,
+    "equinox": 318.8333333333333
+   }
+  }
+ },
+ "made-up \u00b7 12 sats \u00b7 Equinox value 8": {
+  "LOW": {
+   "ours_vs_local": 3.3926330019939313,
+   "equinox_vs_local": 0.7928466886834407,
+   "ours_vs_equinox": 2.5802463007382537,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 44.1,
+    "fleet": 21.316666666666666,
+    "equinox": 45.699999999999996
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 76.5,
+    "equinox": 294.1666666666667
+   }
+  },
+  "ELEVATED": {
+   "ours_vs_local": 3.174013738412292,
+   "equinox_vs_local": 0.8102089371522514,
+   "ours_vs_equinox": 2.357447478182939,
+   "ours_wins": 6,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 48.46666666666667,
+    "fleet": 23.91666666666666,
+    "equinox": 49.96666666666667
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 73.33333333333333,
+    "equinox": 322.6666666666667
+   }
+  },
+  "HIGH": {
+   "ours_vs_local": 2.557253505284318,
+   "equinox_vs_local": 1.5678601914104344,
+   "ours_vs_equinox": 0.9783038068479522,
+   "ours_wins": 4,
+   "runs": 6,
+   "low_batt_min": {
+    "local": 0,
+    "fleet": 0,
+    "equinox": 0
+   },
+   "delay": {
+    "local": 60.383333333333326,
+    "fleet": 32.03333333333334,
+    "equinox": 70.58333333333333
+   },
+   "moves": {
+    "local": 0.0,
+    "fleet": 80.83333333333333,
+    "equinox": 338.0
+   }
+  }
+ }
+}
