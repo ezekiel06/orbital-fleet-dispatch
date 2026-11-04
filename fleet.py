@@ -43,6 +43,36 @@ JOB_TYPES = [("Image tagging", 15, 10, False), ("Translation batch", 30, 20, Tru
              ("Video analysis", 60, 40, True)]
 MOVE_DELAY_MIN = 1
 
+# Laser and ground links (SAT_LINK). "none" = the original model: any number of
+# moves per minute, each costing 1 minute. The others limit how much data a
+# satellite can send per minute and make big jobs take longer to move.
+#   today: 3 lasers x 100 Gbps sustained (Starlink figure, SPIE Photonics West;
+#          3 lasers per satellite is our assumption), 100 Gbps to the ground
+#   v3:    6 lasers x 400 Gbps, 1 Tbps to the ground (reported Starlink V3 specs)
+#   slow:  1 laser x 10 Gbps, 10 Gbps to the ground (top of the 1-10 Gbps range
+#          older commercial laser links offer, per the Suncatcher paper)
+import os as _os
+LINKS = {"none": None,
+         "today": {"lasers": 3, "gbps": 100, "ground_gbps": 100},
+         "v3": {"lasers": 6, "gbps": 400, "ground_gbps": 1000},
+         "slow": {"lasers": 1, "gbps": 10, "ground_gbps": 10},
+         "nomove": {"lasers": 0, "gbps": 1, "ground_gbps": 1e9}}  # shared queue, but running jobs never move
+LINK = LINKS[_os.environ.get("SAT_LINK", "none")]
+# Data a 20 kW job must carry when it moves (its working state: model, batch,
+# progress), in GB, scaled by job size. SAT_JOB_IN_GB = input each new job must
+# upload from the ground before it can start (0 = ignore the ground link).
+JOB_GB = float(_os.environ.get("SAT_JOB_GB", "10"))
+JOB_IN_GB = float(_os.environ.get("SAT_JOB_IN_GB", "0"))
+
+
+def _state_gb(j):
+    return JOB_GB * j["kw"] / 20
+
+
+def _transfer_min(gb):
+    """Minutes a move takes over one laser (at least 1, as before)."""
+    return max(1, math.ceil(gb * 8 / LINK["gbps"] / 60)) if LINK else MOVE_DELAY_MIN
+
 
 def sun_dir(jd):
     n = jd - 2451545.0
@@ -197,9 +227,28 @@ def simulate(mode, lit, saa, names, weather, minutes, seed):
     rr = 0  # round-robin pointer for LOCAL
     fleet_log = []
 
+    busy = [[] for _ in names]  # per satellite: minute each busy laser frees up
+    ground_cap = len(names) * LINK["ground_gbps"] * 60 / 8 if LINK else None
+    blocked = 0
     for i in range(minutes):
-        # 1. arrivals
+        for b in busy:
+            b[:] = [e for e in b if e > i]
+        def can_send(src, gb):
+            """A free laser on the sending satellite? A big job ties one up for several minutes."""
+            return not LINK or src is None or len(busy[src]) < LINK["lasers"]
+        def send(src, gb):
+            m = _transfer_min(gb)
+            if LINK:
+                busy[src].append(i + m)
+            return m
+        # 1. arrivals (inputs come up from the ground, shared fleet-wide link)
+        up = 0.0
         while nxt < len(by_arrival) and by_arrival[nxt]["arrive"] <= i:
+            if LINK and JOB_IN_GB > 0:
+                gb = JOB_IN_GB * by_arrival[nxt]["kw"] / 20
+                if up + gb > ground_cap:
+                    break  # waits for next minute's uplink
+                up += gb
             j = by_arrival[nxt]; nxt += 1
             j["state"] = "queued"
             if mode == "local":
@@ -216,7 +265,7 @@ def simulate(mode, lit, saa, names, weather, minutes, seed):
                 else:
                     j["state"] = "queued"
                     if mode == "fleet":  # hand it over the laser link, progress kept
-                        j["prev"] = si; j["sat"] = None; j["hold"] = MOVE_DELAY_MIN
+                        j["prev"] = si; j["sat"] = None; j["hold"] = 0 if LINK else MOVE_DELAY_MIN
             s.running = keep
 
         # 3. assign queued jobs
@@ -235,6 +284,9 @@ def simulate(mode, lit, saa, names, weather, minutes, seed):
             for cands in tiers:
                 best_spare = None
                 for c in cands:
+                    src = j.get("prev")
+                    if src is not None and c != src and not can_send(src, _state_gb(j)):
+                        continue  # sender's lasers are full this minute
                     spare = budgets[c] - sum(x["kw"] for x in sats[c].running)
                     # best fit: the satellite whose spare power is closest to the job's size
                     if spare >= j["kw"] and (best_spare is None or spare < best_spare):
@@ -244,6 +296,10 @@ def simulate(mode, lit, saa, names, weather, minutes, seed):
             if best is not None:
                 if j.get("prev") is not None and j["prev"] != best:
                     moves += 1
+                    if LINK:
+                        j["stall"] = send(j["prev"], _state_gb(j))
+                elif j.get("prev") is not None:
+                    pass
                 j["prev"] = None
                 j["sat"] = best; j["state"] = "running"
                 sats[best].running.append(j)
@@ -261,9 +317,11 @@ def simulate(mode, lit, saa, names, weather, minutes, seed):
                         spare = budgets[c] - sum(x["kw"] for x in t.running)
                         if spare >= j["kw"] and (tspare is None or spare < tspare):
                             target, tspare = c, spare
+                    if target is not None and not can_send(si, _state_gb(j)):
+                        blocked += 1; target = None
                     if target is not None:
                         s.running.remove(j); sats[target].running.append(j)
-                        j["sat"] = target; j["stall"] = MOVE_DELAY_MIN; moves += 1
+                        j["sat"] = target; j["stall"] = send(si, _state_gb(j)); moves += 1
 
         # 4. run a minute: progress, bit flips, physics
         total_gpu = 0.0
@@ -300,6 +358,7 @@ def simulate(mode, lit, saa, names, weather, minutes, seed):
         "restarts": restarts,
         "wasted_kwh": round(energy_wasted, 1),
         "moves": moves,
+        "moves_blocked": blocked,
         "avg_delay_min": round(float(np.mean(waits)), 1) if waits else None,
         "sat_minutes_battery_low": int(sum(s.min_low for s in sats)),
         "lowest_battery_pct": round(min(s.min_batt for s in sats), 1),

@@ -67,7 +67,30 @@ At 96 satellites the AI also won all 72 runs of the separate confirmation test, 
 went below its 70% floor. Realistic weather = calm 90% / moderate storm 8% / big storm 2%;
 stormy = 50 / 25 / 25.
 
-### 4. Money saved at launch: less battery to fly
+### 4. Laser-link limits: the gain survives real bandwidth
+
+Moving a running job means sending its working state over a laser link. `link_test.py` caps each
+satellite's lasers at real speeds and makes jobs carry more data (AI1 specs, 53°, sharing vs. no
+sharing, calm / moderate / big storm):
+
+| Link setup | Data per job moved | 12 satellites | 48 satellites |
+| --- | --- | --- | --- |
+| Starlink today (3 × 100 Gbps) | 10–100 GB | +3.8 / +3.5 / +3.4% | +3.7 / +3.8 / +3.0% |
+| Starlink today | 1 TB | +3.6 / +2.7 / +3.3% | +3.8 / +3.5 / +3.2% |
+| Starlink today | 5 TB | +0.2 / −0.6 / +1.3% | +0.9 / +0.7 / +0.5% |
+| Starlink V3 (6 × 400 Gbps) | 5 TB | +3.2 / +2.7 / +3.1% | +3.7 / +3.5 / +3.7% |
+| Slow (1 × 10 Gbps) | 1 TB | −3.2 / −4.5 / −3.4% | −2.4 / −2.6 / −1.7% |
+| Shared queue, running jobs never move | — | +4.4 / +4.0 / +4.7% | +4.3 / +3.9 / +4.1% |
+
+Most of the gain comes from *where new jobs start*, which needs only a tiny dispatch message, not
+from moving running jobs. Moving very large jobs over slow links costs more than it saves, so a
+real dispatcher should place work and avoid moving heavy jobs. Sources: Starlink sustains 100 Gbps
+per laser link ([SPIE Photonics West via TechSpot](https://www.techspot.com/community/topics/starlink-satellites-exchange-petabytes-of-data-per-day-through-space-laser-links.284184));
+Starlink V3 reports six 400 Gbps lasers and 1 Tbps downlink ([Converge Digest](https://convergedigest.com/starlink-v3-boosts-per-satellite-downlink-capacity-to-1-tbps/));
+commercial laser links run 1–100 Gbps and Google's Suncatcher design needs ~10 Tbps with satellites
+100–200 m apart ([paper](https://arxiv.org/abs/2511.19468)). Lasers per satellite today (3) is our assumption.
+
+### 5. Money saved at launch: less battery to fly
 
 A sharing fleet matches a non-sharing fleet's output with **~51 kWh less battery per satellite**
 (240 → ~189 kWh). That's **300–424 kg** per satellite (at 170 / 120 Wh/kg space battery packs):
@@ -77,14 +100,14 @@ A sharing fleet matches a non-sharing fleet's output with **~51 kWh less battery
 | $100/kg (Starship target) | $30M – $42M |
 | $1,000/kg (illustrative early Starship) | $300M – $424M |
 
-### 5. Design checks on SpaceX's reported AI1 numbers
+### 6. Design checks on SpaceX's reported AI1 numbers
 
 - A 110 m² radiator works only if it sheds heat from **both faces**: it settles near 58 °C at
   120 kW, versus ~121 °C on one face (`radiator_check.py`).
 - Keeping ~99% of full output through Earth's shadow on a 53° orbit takes **~240 kWh** of
   battery with a 70% floor (`battery_sizing.py`).
 
-### 6. Problem detection on real ESA telemetry
+### 7. Problem detection on real ESA telemetry
 
 On ESA's OPS-SAT anomaly benchmark, a supervised model catches 102 of 113 real problems
 (F1 0.91) vs. 61 for fixed alarm limits, close to the paper's published Random Forest result.
@@ -142,6 +165,7 @@ run `python satnogs_fetch.py`, then `python canvas_analysis.py`.
 | 8 | `confirm_fleet.py`, `hybrid.py` | Paired 40-run tests; AI used only where it proved better |
 | 9 | `value.py`, `savings.py` | Money made (extra computing) and saved (battery mass) |
 | — | `scale_test.py` | Sharing gain at 12 / 48 / 96 satellites |
+| — | `link_test.py` | Sharing gain with real laser-link speed limits |
 | 10 | `radiator_check.py`, `battery_sizing.py` | Design checks |
 | 11 | `telemetry_check.py`, `satnogs_fetch.py`, `canvas_analysis.py` | Real telemetry |
 | — | `sat_profile.py` | Satellite and orbit setups; put your own specs here |
@@ -157,6 +181,8 @@ Being upfront about these is the point:
   (185 kW), battery size, and thermal mass are our estimates. Real specs aren't public.
 - **Bit-flip rates** are derived from Google's published TPU test results. The South
   Atlantic Anomaly (×5) and storm multipliers (×3, ×10) are assumptions.
+- **Links:** results above use unlimited links unless noted; `SAT_LINK=today|v3|slow` turns on
+  speed limits. Multi-hop routing and laser range are not modeled.
 - **Simple heat model:** the whole satellite has one temperature; no hot spots.
 - **Every extra kWh is assumed sold** at today's rental prices. GPU prices move fast.
 - **Launch prices:** Starship has no published price; the $/kg values are scenarios.
