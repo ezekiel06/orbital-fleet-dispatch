@@ -1,7 +1,8 @@
 """Step 11: Is the fleet AI's edge real, or luck?
 
 Plays every dispatcher on the SAME runs (same orbit slice, same jobs, same
-bit-flip dice) on the 12 real Starlink satellites, then compares them run by
+bit-flip dice) on the test orbits (12 real Starlink satellites by default, or the
+SAT_PROFILE / SAT_FLEET setup), then compares them run by
 run ("paired" comparison). For each weather it reports the AI's average edge
 over each rule with a 95% range (bootstrap: resample the runs 10,000 times).
 If that range stays above zero, the edge is unlikely to be luck.

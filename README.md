@@ -164,9 +164,10 @@ its shadow and the South Atlantic Anomaly, with battery levels and laser-link jo
 
 ```bash
 pip install -r requirements.txt
-python run_all.py              # rerun every test with the included trained models (~10 min)
+python run_all.py              # rerun the core tests with the included trained models (~10 min)
 python run_all.py --train      # also retrain both AIs (~30-40 min)
 python run_all.py --refresh    # download today's Starlink orbits first
+python run_all.py --extended   # also the 12/48/96-satellite, laser-link and real-job tests (~1 hour)
 ```
 
 Then open `dashboard.html`.
@@ -183,6 +184,10 @@ SAT_PROFILE=ai1_53 SAT_FLEET=6x8 python fleet_rl.py train         # 48 satellite
 
 (Windows: `set SAT_PROFILE=ai1_53` on its own line first.) Run each setup in its own folder,
 since results are written to the current folder.
+
+**Real AI jobs:** `python workload.py` downloads the Helios trace from GitHub and builds
+`helios_jobs.npz` (done automatically by `--extended`). Then `python helios_test.py`, or set
+`SAT_JOBS=helios` before any fleet script. Laser limits: set `SAT_LINK=today` (or `v3`, `slow`).
 
 **Real telemetry (optional):** `python fetch_opssat.py` then `python telemetry_check.py`.
 For SatNOGS, put your own API token in `satnogs_token.txt` (git-ignored, never commit it) and

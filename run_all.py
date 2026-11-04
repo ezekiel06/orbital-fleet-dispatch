@@ -5,6 +5,9 @@
     python run_all.py --refresh    also download today's Starlink orbits first (needs internet)
     python run_all.py --telemetry  also rerun the real-telemetry steps (ESA problem detector,
                                    CANVAS analysis), if their data files are present
+    python run_all.py --extended   also run the bigger tests: 12/48/96 satellites, laser-link
+                                   limits, and real AI jobs from the Helios trace (~1 hour;
+                                   downloads the Helios trace from GitHub the first time)
 
 It stops at the first step that fails and says which one. At the end it prints
 a summary and rebuilds dashboard.html.
@@ -89,6 +92,7 @@ def main():
     ap.add_argument("--train", action="store_true", help="retrain both AIs")
     ap.add_argument("--refresh", action="store_true", help="download today's Starlink orbits first")
     ap.add_argument("--telemetry", action="store_true", help="also rerun the real-telemetry steps")
+    ap.add_argument("--extended", action="store_true", help="also run fleet-size, laser-link and real-job tests")
     ap.add_argument("--steps", type=int, default=None, help="training steps per try (default: each script's own)")
     ap.add_argument("--episodes", type=int, default=40, help="test runs per weather for the fleet checks")
     a = ap.parse_args()
@@ -125,7 +129,14 @@ def main():
         if os.path.exists("satnogs_68635.jsonl"):
             run("14. CANVAS battery/temperature analysis", ["canvas_analysis.py"], required=False)
 
-    run("15. Rebuild dashboard", ["make_dashboard.py"])
+    if a.extended:
+        run("15. Bigger fleets (12 / 48 / 96 satellites)", ["scale_test.py"])
+        run("16. Laser-link speed limits", ["link_test.py"])
+        if not os.path.exists("helios_jobs.npz"):
+            run("17a. Download real AI jobs (Helios trace)", ["workload.py"])
+        run("17. Real AI jobs", ["helios_test.py"])
+
+    run("18. Rebuild dashboard", ["make_dashboard.py"])
     print(f"\nDone in {(time.time() - start) / 60:.1f} minutes.")
     summary()
 

@@ -2,7 +2,7 @@
 
 Method:
   1. Extra computing = hybrid's work minus the comparison's work (kWh of GPU work),
-     from hybrid_results.json (12 real Starlink satellites, fresh test runs),
+     from hybrid_results.json (fresh test runs on the fleet set by SAT_FLEET / SAT_PROFILE),
      blended over a weather mix, scaled to one satellite for one year.
   2. Dollar value = that kWh x what one kWh of GPU-server power earns when
      rented out at cloud GPU prices.
@@ -15,7 +15,8 @@ Rental value per kWh of server power (prices checked Nov 2026, see sources):
 
 Assumptions (state these when you present it):
   - Every extra kWh of computing finds a paying customer at those prices.
-  - The satellite design is ours (100 kW of GPUs), not a real company's.
+  - The satellite design comes from SAT_PROFILE (100 kW of GPUs by default, 120 kW
+    for the AI1 profiles), estimated, not confirmed company specs.
   - Space weather mix: "realistic" = calm 90% / moderate 8% / big storm 2%
     (big storms are rare, a few days a year near solar maximum);
     "stormy" = 50/25/25, the harsh mix used in training.

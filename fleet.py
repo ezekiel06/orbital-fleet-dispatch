@@ -1,7 +1,8 @@
 """Step 6: A fleet of orbital compute satellites that share work.
 
-The SpaceX-style setup: 12 satellites in Starlink-style orbits (53 degree tilt,
-550 km up), 3 orbital planes x 4 satellites. They're linked by lasers, so a job
+The SpaceX-style setup: by default 12 satellites in Starlink-style orbits (53 degree
+tilt, 550 km up), 3 orbital planes x 4 satellites; SAT_PROFILE and SAT_FLEET change
+the orbit and size (up to 96 tested). They're linked by lasers, so a job
 can run on whichever satellite is best placed right now.
 
 Two new real-world effects:
