@@ -185,8 +185,10 @@ space weather, and fleet wear, and it runs the same 12-satellite fleet model liv
 the gain from sharing, its dollar value, design warnings (radiator too small, battery floor
 broken), and the battery mass sharing saves. Open the file directly; no install needed.
 
-`web/orbit.html` is an animated 3D view of the fleet: satellites circling Earth, passing through
-its shadow and the South Atlantic Anomaly, with battery levels and laser-link job handoffs.
+`web/orbit.html` is a 3D view of the fleet (three.js): satellites circling a real Earth (NASA Blue
+Marble by day, city lights by night), passing through its shadow and the South Atlantic Anomaly, with
+battery levels and laser-link job handoffs. Drag to turn, scroll to zoom. `web/orbit2d.html` is the
+lighter 2D version for devices without WebGL.
 
 ## Quick start
 
@@ -303,6 +305,7 @@ and results at 12, 48, and 96 satellites.
   [GS Yuasa module](https://www.satnow.com/products/batteries/gs-yuasa-lithium-power/98-1270-ma190-206)
 - Launch prices: [New Space Economy, June 2026](https://newspaceeconomy.ca/2026/06/21/how-accurate-were-elon-musks-falcon-9-and-starship-kg-claims/)
 - Real AI jobs: [Helios trace](https://github.com/S-Lab-System-Group/HeliosData), SenseTime / S-Lab, SC '21 paper; raw data not redistributed here
+- Earth imagery: NASA Blue Marble and Black Marble (public domain), via the [three-globe](https://github.com/vasturiano/three-globe) examples; 3D: [three.js](https://threejs.org)
 - RL: [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3); orbits: [Skyfield](https://rhodesmill.org/skyfield/)
 
 ## License
