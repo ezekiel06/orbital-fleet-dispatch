@@ -68,3 +68,11 @@ def test_real_job_sampler_hits_target_load(tmp_path, monkeypatch):
     offered = sum(j["kw"] * min(j["mins"], 720 - j["arrive"]) for j in jobs)
     assert offered == pytest.approx(12 * 100.0 * 720, rel=0.02)
     assert all(j["kw"] <= 100.0 for j in jobs)
+
+
+def test_earth_heat_warms_radiators():
+    from power_thermal import SAT, earth_heat_w
+    p = dict(SAT, earth_view=0.24)
+    # Earth's infrared glow always; reflected sunlight only on the day side
+    assert earth_heat_w(p, lit=True) > earth_heat_w(p, lit=False) > 0
+    assert earth_heat_w(dict(p, earth_view=0.0), lit=True) == 0

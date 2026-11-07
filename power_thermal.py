@@ -21,6 +21,26 @@ from orbit_sun import fetch_tle, SAMPLE_TLE, sun_direction, in_sunlight
 
 SIGMA = 5.670e-8  # physics constant for how strongly hot things radiate heat
 
+# Earth's thermal environment: NASA/TM-2001-211221 (Anderson et al.) orbit-average Earth IR for
+# 30-60 degree orbits (234 W/m2; global average 239), albedo 0.30. Radiator coating: white
+# paint at beginning of life (alpha ~0.1-0.2, NASA TM-104335). Absorptivity/emissivity are for a white or silvered radiator coating.
+EARTH_HEAT = {"earth_ir_wm2": 234.0, "albedo": 0.30, "solar_wm2": 1361.0,
+              "rad_absorptivity": 0.15, "albedo_sunlit_avg": 0.5}
+
+
+def earth_heat_w(p, lit):
+    """Heat Earth adds to the radiators (W): its infrared glow always, reflected sunlight
+    on the day side. Scales with how much of Earth the radiator faces see."""
+    f = p.get("earth_view", 0.0)
+    if f <= 0:
+        return 0.0
+    e = EARTH_HEAT
+    area = p["radiator_m2"]
+    ir = p["emissivity"] * e["earth_ir_wm2"] * f * area
+    alb = (e["rad_absorptivity"] * e["albedo"] * e["solar_wm2"] * e["albedo_sunlit_avg"] * f * area) if lit else 0.0
+    return ir + alb
+
+
 SAT = {
     "solar_kw": 140.0,         # panel output in full sunlight
     "gpu_max_kw": 100.0,       # GPU draw at 100% load
@@ -31,6 +51,10 @@ SAT = {
     "radiator_m2": 150.0,      # radiator area
     "emissivity": 0.90,        # how well radiators radiate (1.0 = perfect)
     "sun_heat_kw": 10.0,       # extra heat from sunlight hitting the craft
+    # Earth's own heat (infrared glow) and reflected sunlight (albedo) landing on the radiators.
+    # Values filled in from sources in EARTH_HEAT below; earth_view = share of each radiator
+    # face's view taken up by Earth (0 = facing deep space, ~0.3 = edge-on to Earth at 650 km).
+    "earth_view": 0.24,        # radiators edge-on to Earth at ~650 km (vertical plate: 0.24 per face)
     "heat_capacity_j_per_k": 1.6e6,  # thermal mass: higher = temps change slower
     "temp_start_c": 40.0,
     "temp_limit_c": 85.0,      # hard limit for the GPUs
@@ -85,7 +109,7 @@ def simulate(timeline, p=SAT):
         batt = min(max(batt, 0.0), p["battery_kwh"])
 
         # Heat: in = electronics + sunlight; out = radiated to space.
-        heat_in_w = use_kw * 1000 + (p["sun_heat_kw"] * 1000 if lit else 0)
+        heat_in_w = use_kw * 1000 + (p["sun_heat_kw"] * 1000 if lit else 0) + earth_heat_w(p, lit)
         heat_out_w = p["emissivity"] * SIGMA * p["radiator_m2"] * (temp_k ** 4 - 3.0 ** 4)
         temp_k += (heat_in_w - heat_out_w) * 60 / p["heat_capacity_j_per_k"]
 

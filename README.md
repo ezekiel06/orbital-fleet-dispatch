@@ -169,6 +169,22 @@ A sharing fleet matches a non-sharing fleet's output with **~51 kWh less battery
 
 - A 110 m² radiator works only if it sheds heat from **both faces**: it settles near 58 °C at
   120 kW, versus ~121 °C on one face (`radiator_check.py`).
+- **Earth's own heat counts.** In low orbit the radiators also absorb Earth's infrared glow
+  (~234 W/m², [NASA/TM-2001-211221](https://ntrs.nasa.gov/api/citations/20020001443/downloads/20020001443.pdf))
+  and reflected sunlight (albedo 0.30). Edge-on to Earth, each face sees ~24% Earth at 650 km
+  (the default; one face pointed straight down is the worst case):
+
+  | Radiator angle | Earth adds | 120 kW GPUs | 150 kW bursts |
+  | --- | --- | --- | --- |
+  | Facing deep space | 0 kW | 58 °C | 75 °C |
+  | Edge-on to Earth (default) | 12.7 kW | 65.5 °C | 81.6 °C |
+  | One face straight down | 21.8 kW | 70.6 °C | 86.0 °C (over the 85 °C limit) |
+
+  Rerunning the main tests with it on (`earth_heat_test.py`): at 120 kW, **nothing changes** in work
+  done or sharing gain, for made-up and real jobs, at 12 and 48 satellites; peak temperature rises
+  from 58 °C to 65–71 °C. During 150 kW bursts the satellites slow down to stay under 80 °C, costing
+  **about 2% of work edge-on and 4% at the worst angle**. The AI results in section 2 were trained
+  before this term was added.
 - Keeping ~99% of full output through Earth's shadow on a 53° orbit takes **~240 kWh** of
   battery with a 70% floor (`battery_sizing.py`).
 
@@ -240,7 +256,7 @@ run `python satnogs_fetch.py`, then `python canvas_analysis.py`.
 | — | `link_test.py` | Sharing gain with real laser-link speed limits |
 | — | `workload.py`, `helios_test.py` | Real AI jobs from the Helios GPU trace |
 | — | `equinox_test.py` | Head to head with Equinox, a published orbital scheduler |
-| 10 | `radiator_check.py`, `battery_sizing.py` | Design checks |
+| 10 | `radiator_check.py`, `battery_sizing.py`, `earth_heat_test.py` | Design checks, Earth's heat |
 | 11 | `telemetry_check.py`, `satnogs_fetch.py`, `canvas_analysis.py` | Real telemetry |
 | — | `sat_profile.py` | Satellite and orbit setups; put your own specs here |
 | — | `run_all.py`, `make_dashboard.py` | One-command pipeline and dashboard |
@@ -257,7 +273,8 @@ Being upfront about these is the point:
   Atlantic Anomaly (×5) and storm multipliers (×3, ×10) are assumptions.
 - **Links:** results above use unlimited links unless noted; `SAT_LINK=today|v3|slow` turns on
   speed limits. Multi-hop routing and laser range are not modeled.
-- **Simple heat model:** the whole satellite has one temperature; no hot spots.
+- **Simple heat model:** the whole satellite has one temperature; no hot spots. Earth's heat uses
+  orbit-average values (`SAT_EARTH_VIEW` sets the radiator angle; 0 turns it off).
 - **Every extra kWh is assumed sold** at today's rental prices. GPU prices move fast.
 - **Launch prices:** Starship has no published price; the $/kg values are scenarios.
 - **Fleet size:** tested at 12, 48, and 96 satellites, AI included. Thousands are untested.

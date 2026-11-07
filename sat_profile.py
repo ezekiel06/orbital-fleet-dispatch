@@ -85,6 +85,8 @@ def apply(sat):
             sat["battery_kwh"] = 120.0
         elif SCENARIO == "burst150":
             sat["gpu_max_kw"] = 150.0
+    if os.environ.get("SAT_EARTH_VIEW"):  # share of each radiator face's view taken by Earth
+        sat["earth_view"] = float(os.environ["SAT_EARTH_VIEW"])
     return sat
 
 

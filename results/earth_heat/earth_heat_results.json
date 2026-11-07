@@ -1,0 +1,250 @@
+{
+ "made-up \u00b7 12 sats": {
+  "off": {
+   "LOW": {
+    "gain_pct": 3.3926330019939313,
+    "delivered_fleet": 16278.333333333334,
+    "peak_temp_c": 57.7,
+    "low_batt_min": 0
+   },
+   "ELEVATED": {
+    "gain_pct": 3.174013738412292,
+    "delivered_fleet": 15760.716666666667,
+    "peak_temp_c": 57.8,
+    "low_batt_min": 0
+   },
+   "HIGH": {
+    "gain_pct": 2.557253505284318,
+    "delivered_fleet": 13886.216666666667,
+    "peak_temp_c": 57.9,
+    "low_batt_min": 0
+   }
+  },
+  "edge-on (default)": {
+   "LOW": {
+    "gain_pct": 3.3926330019939313,
+    "delivered_fleet": 16278.333333333334,
+    "peak_temp_c": 65.3,
+    "low_batt_min": 0
+   },
+   "ELEVATED": {
+    "gain_pct": 3.174013738412292,
+    "delivered_fleet": 15760.716666666667,
+    "peak_temp_c": 65.4,
+    "low_batt_min": 0
+   },
+   "HIGH": {
+    "gain_pct": 2.557253505284318,
+    "delivered_fleet": 13886.216666666667,
+    "peak_temp_c": 65.5,
+    "low_batt_min": 0
+   }
+  },
+  "face down": {
+   "LOW": {
+    "gain_pct": 3.3926330019939313,
+    "delivered_fleet": 16278.333333333334,
+    "peak_temp_c": 70.4,
+    "low_batt_min": 0
+   },
+   "ELEVATED": {
+    "gain_pct": 3.174013738412292,
+    "delivered_fleet": 15760.716666666667,
+    "peak_temp_c": 70.5,
+    "low_batt_min": 0
+   },
+   "HIGH": {
+    "gain_pct": 2.557253505284318,
+    "delivered_fleet": 13886.216666666667,
+    "peak_temp_c": 70.6,
+    "low_batt_min": 0
+   }
+  }
+ },
+ "made-up \u00b7 12 sats \u00b7 bursting to 150 kW": {
+  "off": {
+   "LOW": {
+    "gain_pct": 1.4043304351515296,
+    "delivered_fleet": 17961.316666666666,
+    "peak_temp_c": 74.4,
+    "low_batt_min": 0
+   },
+   "ELEVATED": {
+    "gain_pct": 0.7464332571294807,
+    "delivered_fleet": 17328.033333333333,
+    "peak_temp_c": 74.4,
+    "low_batt_min": 0
+   },
+   "HIGH": {
+    "gain_pct": 1.4151578233696636,
+    "delivered_fleet": 15502.083333333334,
+    "peak_temp_c": 74.7,
+    "low_batt_min": 0
+   }
+  },
+  "edge-on (default)": {
+   "LOW": {
+    "gain_pct": 1.6923793166122654,
+    "delivered_fleet": 17631.566666666666,
+    "peak_temp_c": 77.0,
+    "low_batt_min": 0
+   },
+   "ELEVATED": {
+    "gain_pct": 1.010499347096283,
+    "delivered_fleet": 16954.616666666665,
+    "peak_temp_c": 77.0,
+    "low_batt_min": 0
+   },
+   "HIGH": {
+    "gain_pct": 0.28991107324472887,
+    "delivered_fleet": 15166.533333333333,
+    "peak_temp_c": 77.0,
+    "low_batt_min": 0
+   }
+  },
+  "face down": {
+   "LOW": {
+    "gain_pct": 0.9406192702396177,
+    "delivered_fleet": 17238.283333333333,
+    "peak_temp_c": 77.8,
+    "low_batt_min": 0
+   },
+   "ELEVATED": {
+    "gain_pct": 0.5813800746134596,
+    "delivered_fleet": 16585.716666666667,
+    "peak_temp_c": 77.9,
+    "low_batt_min": 0
+   },
+   "HIGH": {
+    "gain_pct": 0.3494791057141714,
+    "delivered_fleet": 14672.616666666667,
+    "peak_temp_c": 77.8,
+    "low_batt_min": 0
+   }
+  }
+ },
+ "made-up \u00b7 48 sats": {
+  "off": {
+   "LOW": {
+    "gain_pct": 4.6221713523712324,
+    "delivered_fleet": 65782.91666666667,
+    "peak_temp_c": 57.7,
+    "low_batt_min": 0
+   },
+   "ELEVATED": {
+    "gain_pct": 4.366254385623018,
+    "delivered_fleet": 63555.93333333334,
+    "peak_temp_c": 57.9,
+    "low_batt_min": 0
+   },
+   "HIGH": {
+    "gain_pct": 3.8028892732479966,
+    "delivered_fleet": 56586.38333333333,
+    "peak_temp_c": 58.0,
+    "low_batt_min": 0
+   }
+  },
+  "edge-on (default)": {
+   "LOW": {
+    "gain_pct": 4.6221713523712324,
+    "delivered_fleet": 65782.91666666667,
+    "peak_temp_c": 65.3,
+    "low_batt_min": 0
+   },
+   "ELEVATED": {
+    "gain_pct": 4.366254385623018,
+    "delivered_fleet": 63555.93333333334,
+    "peak_temp_c": 65.5,
+    "low_batt_min": 0
+   },
+   "HIGH": {
+    "gain_pct": 3.8028892732479966,
+    "delivered_fleet": 56586.38333333333,
+    "peak_temp_c": 65.5,
+    "low_batt_min": 0
+   }
+  },
+  "face down": {
+   "LOW": {
+    "gain_pct": 4.6221713523712324,
+    "delivered_fleet": 65782.91666666667,
+    "peak_temp_c": 70.4,
+    "low_batt_min": 0
+   },
+   "ELEVATED": {
+    "gain_pct": 4.366254385623018,
+    "delivered_fleet": 63555.93333333334,
+    "peak_temp_c": 70.5,
+    "low_batt_min": 0
+   },
+   "HIGH": {
+    "gain_pct": 3.8028892732479966,
+    "delivered_fleet": 56586.38333333333,
+    "peak_temp_c": 70.6,
+    "low_batt_min": 0
+   }
+  }
+ },
+ "real jobs \u00b7 12 sats": {
+  "off": {
+   "LOW": {
+    "gain_pct": 6.281061451426871,
+    "delivered_fleet": 12749.183333333334,
+    "peak_temp_c": 57.9,
+    "low_batt_min": 0
+   },
+   "ELEVATED": {
+    "gain_pct": 7.919123578323554,
+    "delivered_fleet": 11455.033333333335,
+    "peak_temp_c": 57.9,
+    "low_batt_min": 0
+   },
+   "HIGH": {
+    "gain_pct": 7.814075069379712,
+    "delivered_fleet": 9372.166666666666,
+    "peak_temp_c": 57.9,
+    "low_batt_min": 0
+   }
+  },
+  "edge-on (default)": {
+   "LOW": {
+    "gain_pct": 6.281061451426871,
+    "delivered_fleet": 12749.183333333334,
+    "peak_temp_c": 65.5,
+    "low_batt_min": 0
+   },
+   "ELEVATED": {
+    "gain_pct": 7.919123578323554,
+    "delivered_fleet": 11455.033333333335,
+    "peak_temp_c": 65.5,
+    "low_batt_min": 0
+   },
+   "HIGH": {
+    "gain_pct": 7.814075069379712,
+    "delivered_fleet": 9372.166666666666,
+    "peak_temp_c": 65.5,
+    "low_batt_min": 0
+   }
+  },
+  "face down": {
+   "LOW": {
+    "gain_pct": 6.281061451426871,
+    "delivered_fleet": 12749.183333333334,
+    "peak_temp_c": 70.5,
+    "low_batt_min": 0
+   },
+   "ELEVATED": {
+    "gain_pct": 7.919123578323554,
+    "delivered_fleet": 11455.033333333335,
+    "peak_temp_c": 70.5,
+    "low_batt_min": 0
+   },
+   "HIGH": {
+    "gain_pct": 7.814075069379712,
+    "delivered_fleet": 9372.166666666666,
+    "peak_temp_c": 70.5,
+    "low_batt_min": 0
+   }
+  }
+ }
+}

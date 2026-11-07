@@ -20,7 +20,7 @@ import gymnasium as gym
 from gymnasium import spaces
 from skyfield.api import EarthSatellite, load
 
-from power_thermal import SAT, SIGMA
+from power_thermal import SAT, SIGMA, earth_heat_w
 from orbit_sun import SAMPLE_TLE, fetch_tle, EARTH_RADIUS_KM
 from space_weather import ERROR_MULT
 
@@ -220,7 +220,7 @@ class OrbitalComputeEnv(gym.Env):
         use = gpu_kw + p["bus_kw"]
         net = gen - use
         self.batt = min(max(self.batt + (net * p["charge_eff"] if net > 0 else net) / 60, 0.0), p["battery_kwh"])
-        heat_in = use * 1000 + (p["sun_heat_kw"] * 1000 if lit else 0)
+        heat_in = use * 1000 + (p["sun_heat_kw"] * 1000 if lit else 0) + earth_heat_w(p, lit)
         heat_out = p["emissivity"] * SIGMA * p["radiator_m2"] * (self.temp_k ** 4 - 3.0 ** 4)
         self.temp_k += (heat_in - heat_out) * 60 / p["heat_capacity_j_per_k"]
 
